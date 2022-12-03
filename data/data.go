@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	Year     = 2022
 	URL      = "https://adventofcode.com/%d/day/%d"
 	Filename = "data/day%d"
 )

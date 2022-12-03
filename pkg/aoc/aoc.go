@@ -1,0 +1,5 @@
+package aoc
+
+func someFunc() {
+
+}

@@ -1,10 +1,3 @@
-/*
-
-Copyright (c) 2021 - Present. Blend Labs, Inc. All rights reserved
-Blend Confidential - Restricted
-
-*/
-
 package clipboard
 
 import "os/exec"
