@@ -120,10 +120,109 @@ func (s Solution) Year2022Day2(input string) (int, int) {
 
 func (s Solution) Year2022Day3(input string) (int, int) {
 	strArr := readFile(input)
-
+	// Lowercase item types a through z have priorities 1 through 26.
+	// Uppercase item types A through Z have priorities 27 through 52.
+	const lowerFactor = int32(96)
+	const upperFactor = int32(38)
+	res1 := int32(0)
 	for _, line := range strArr {
-
+		set := make(map[int32]bool)
+		first, second := line[:len(line)/2], line[len(line)/2:]
+		for _, char := range first {
+			set[char] = true
+		}
+		for _, char := range second {
+			if _, ok := set[char]; ok {
+				factor := lowerFactor
+				if char < 'a' {
+					factor = upperFactor
+				}
+				res1 += char - factor
+				break
+			}
+		}
 	}
+
+	res2 := int32(0)
+	for i := 0; i < len(strArr); i += 3 {
+		set := make(map[int32]bool)
+		first, second, third := strArr[i], strArr[i+1], strArr[i+2]
+		for _, char := range first {
+			set[char] = true
+		}
+		for _, char := range second {
+			factor := lowerFactor
+			if char < 'a' {
+				factor = upperFactor
+			}
+			if _, ok := set[char]; ok {
+				for _, currChar := range third {
+					if currChar == char {
+						res2 += char - factor
+						goto breakout
+					}
+				}
+			}
+		}
+	breakout:
+	}
+	return int(res1), int(res2)
+}
+
+func (s Solution) Year2022Day4(input string) (int, int) {
+	strArr := readFile(input)
+	type interval struct {
+		s, e int
+	}
+
+	contained := func(int1 interval, int2 interval) bool {
+		return int1.s <= int2.s && int1.e >= int2.e
+	}
+
+	numContained := 0
+	for _, line := range strArr {
+		sections := strings.Split(line, ",")
+		inter := strings.Split(sections[0], "-")
+		start1, err := strconv.Atoi(inter[0])
+		check(err)
+		end1, err := strconv.Atoi(inter[1])
+		check(err)
+		inter = strings.Split(sections[1], "-")
+		start2, err := strconv.Atoi(inter[0])
+		check(err)
+		end2, err := strconv.Atoi(inter[1])
+		check(err)
+
+		int1, int2 := interval{s: start1, e: end1}, interval{s: start2, e: end2}
+		if contained(int1, int2) || contained(int2, int1) {
+			numContained += 1
+		}
+	}
+
+	overlap := func(int1 interval, int2 interval) bool {
+		return int1.s <= int2.s && int1.e >= int2.s
+	}
+
+	numOverlap := 0
+	for _, line := range strArr {
+		sections := strings.Split(line, ",")
+		inter := strings.Split(sections[0], "-")
+		start1, err := strconv.Atoi(inter[0])
+		check(err)
+		end1, err := strconv.Atoi(inter[1])
+		check(err)
+		inter = strings.Split(sections[1], "-")
+		start2, err := strconv.Atoi(inter[0])
+		check(err)
+		end2, err := strconv.Atoi(inter[1])
+		check(err)
+
+		int1, int2 := interval{s: start1, e: end1}, interval{s: start2, e: end2}
+		if overlap(int1, int2) || overlap(int2, int1) {
+			numOverlap += 1
+		}
+	}
+	return numContained, numOverlap
 }
 
 func readFile(filename string) []string {
