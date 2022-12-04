@@ -1,7 +1,7 @@
 package data
 
 import (
-	"aoc2021/secret"
+	"aoc/secret"
 	"errors"
 	"fmt"
 	"io"
@@ -30,7 +30,7 @@ type Configuration struct {
 func Post(day, level, result int) error {
 	config := &Configuration{
 		SessionCookie: secret.SessionID,
-		Year:          Year,
+		Year:          2022,
 		Day:           day,
 		Level:         level,
 		Answer:        result,
@@ -46,7 +46,7 @@ func Get(day int, filename string) error {
 	config := &Configuration{
 		SessionCookie: secret.SessionID,
 		Output:        filename,
-		Year:          Year,
+		Year:          2022,
 		Day:           day,
 	}
 
