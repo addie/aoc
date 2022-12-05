@@ -18,11 +18,11 @@ func (s Solution) dataFilename() string {
 	return "data/day" + strconv.Itoa(s.day) + ".txt"
 }
 
-func (s Solution) Execute() (int, int) {
+func (s Solution) Execute() (any, any) {
 	name := fmt.Sprintf("Year%dDay%d", s.year, s.day)
 	inputs := []reflect.Value{reflect.ValueOf(s.dataFilename())}
 	res := reflect.ValueOf(s).MethodByName(name).Call(inputs)
-	return res[0].Interface().(int), res[1].Interface().(int)
+	return res[0].Interface(), res[1].Interface()
 }
 
 func (s Solution) Year2022Day1(input string) (int, int) {
@@ -223,6 +223,87 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 		}
 	}
 	return numContained, numOverlap
+}
+
+func (s Solution) Year2022Day5(input string) (string, string) {
+	strArr := readFile(input)
+
+	// STACKS
+	//             [L] [M]         [M]
+	//         [D] [R] [Z]         [C] [L]
+	//         [C] [S] [T] [G]     [V] [M]
+	// [R]     [L] [Q] [B] [B]     [D] [F]
+	// [H] [B] [G] [D] [Q] [Z]     [T] [J]
+	// [M] [J] [H] [M] [P] [S] [V] [L] [N]
+	// [P] [C] [N] [T] [S] [F] [R] [G] [Q]
+	// [Z] [P] [S] [F] [F] [T] [N] [P] [W]
+	// 1   2   3   4   5   6   7   8   9
+	stacks := [][]string{
+		{"Z", "P", "M", "H", "R"},
+		{"P", "C", "J", "B"},
+		{"S", "N", "H", "G", "L", "C", "D"},
+		{"F", "T", "M", "D", "Q", "S", "R", "L"},
+		{"F", "S", "P", "Q", "B", "T", "Z", "M"},
+		{"T", "F", "S", "Z", "B", "G"},
+		{"N", "R", "V"},
+		{"P", "G", "L", "T", "D", "V", "C", "M"},
+		{"W", "Q", "N", "J", "F", "M", "L"},
+	}
+	// PROCESS MOVES
+	// ex: move 7 from 3 to 9
+	for _, line := range strArr {
+		tokens := strings.Split(line, " ")
+		count, err := strconv.Atoi(tokens[1])
+		check(err)
+		start, err := strconv.Atoi(tokens[3])
+		check(err)
+		end, err := strconv.Atoi(tokens[5])
+		check(err)
+
+		i := 0
+		for i < count {
+			char := stacks[start-1][len(stacks[start-1])-1]
+			stacks[start-1] = stacks[start-1][:len(stacks[start-1])-1]
+			stacks[end-1] = append(stacks[end-1], char)
+			i++
+		}
+	}
+	var resArr1 []string
+	for _, stack := range stacks {
+		char := stack[len(stack)-1]
+		resArr1 = append(resArr1, char)
+	}
+
+	stacks = [][]string{
+		{"Z", "P", "M", "H", "R"},
+		{"P", "C", "J", "B"},
+		{"S", "N", "H", "G", "L", "C", "D"},
+		{"F", "T", "M", "D", "Q", "S", "R", "L"},
+		{"F", "S", "P", "Q", "B", "T", "Z", "M"},
+		{"T", "F", "S", "Z", "B", "G"},
+		{"N", "R", "V"},
+		{"P", "G", "L", "T", "D", "V", "C", "M"},
+		{"W", "Q", "N", "J", "F", "M", "L"},
+	}
+	for _, line := range strArr {
+		tokens := strings.Split(line, " ")
+		count, err := strconv.Atoi(tokens[1])
+		check(err)
+		start, err := strconv.Atoi(tokens[3])
+		check(err)
+		end, err := strconv.Atoi(tokens[5])
+		check(err)
+
+		subStack := stacks[start-1][len(stacks[start-1])-count:]
+		stacks[start-1] = stacks[start-1][:len(stacks[start-1])-count]
+		stacks[end-1] = append(stacks[end-1], subStack...)
+	}
+	var resArr2 []string
+	for _, stack := range stacks {
+		char := stack[len(stack)-1]
+		resArr2 = append(resArr2, char)
+	}
+	return strings.Join(resArr1, ""), strings.Join(resArr2, "")
 }
 
 func readFile(filename string) []string {

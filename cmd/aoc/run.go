@@ -24,6 +24,6 @@ var runCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		res1, res2 := aoc.Run(args[0], args[1])
-		log.Printf("Part 1: %d, Part 2: %d\n", res1, res2)
+		log.Printf("Part 1: %v, Part 2: %v\n", res1, res2)
 	},
 }
