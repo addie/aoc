@@ -2,6 +2,7 @@ package aoc
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -22,16 +23,17 @@ func (s Solution) Execute() (any, any) {
 	name := fmt.Sprintf("Year%dDay%d", s.year, s.day)
 	inputs := []reflect.Value{reflect.ValueOf(s.dataFilename())}
 	res := reflect.ValueOf(s).MethodByName(name).Call(inputs)
+	errors.Join()
 	return res[0].Interface(), res[1].Interface()
 }
 
 func (s Solution) Year2022Day1(input string) (int, int) {
-	strArr := readFile(input)
+	lines := ReadFile(input)
 
 	currentTotal := 0
 	maxTotal := 0
 	var allTotals []int
-	for _, line := range strArr {
+	for _, line := range lines {
 		if line == "" {
 			allTotals = append(allTotals, currentTotal)
 			if currentTotal > maxTotal {
@@ -48,14 +50,14 @@ func (s Solution) Year2022Day1(input string) (int, int) {
 }
 
 func (s Solution) Year2022Day2(input string) (int, int) {
-	strArr := readFile(input)
+	lines := ReadFile(input)
 
 	// Opp A for Rock, B for Paper, and C for Scissors
 	// Me X for Rock, Y for Paper, and Z for Scissors
 	// Score 6 win, 3 tie, 0 loss
 	// Score 1 for Rock, 2 for Paper, and 3 for Scissors
 	part1Total := 0
-	for _, line := range strArr {
+	for _, line := range lines {
 		moves := strings.Split(line, " ")
 		oppMove, myMove := moves[0], moves[1]
 		switch myMove {
@@ -81,7 +83,7 @@ func (s Solution) Year2022Day2(input string) (int, int) {
 	// Score 6 win, 3 tie, 0 loss
 	// Score 1 for Rock, 2 for Paper, and 3 for Scissors
 	part2Total := 0
-	for _, line := range strArr {
+	for _, line := range lines {
 		moves := strings.Split(line, " ")
 		oppMove, outcome := moves[0], moves[1]
 		switch outcome {
@@ -119,13 +121,13 @@ func (s Solution) Year2022Day2(input string) (int, int) {
 }
 
 func (s Solution) Year2022Day3(input string) (int, int) {
-	strArr := readFile(input)
+	lines := ReadFile(input)
 	// Lowercase item types a through z have priorities 1 through 26.
 	// Uppercase item types A through Z have priorities 27 through 52.
-	const lowerFactor = int32(96)
-	const upperFactor = int32(38)
-	res1 := int32(0)
-	for _, line := range strArr {
+	const lowerFactor int32 = 96
+	const upperFactor int32 = 38
+	var res1 int32 = 0
+	for _, line := range lines {
 		set := make(map[int32]bool)
 		first, second := line[:len(line)/2], line[len(line)/2:]
 		for _, char := range first {
@@ -143,10 +145,10 @@ func (s Solution) Year2022Day3(input string) (int, int) {
 		}
 	}
 
-	res2 := int32(0)
-	for i := 0; i < len(strArr); i += 3 {
+	var res2 int32 = 0
+	for i := 0; i < len(lines); i += 3 {
 		set := make(map[int32]bool)
-		first, second, third := strArr[i], strArr[i+1], strArr[i+2]
+		first, second, third := lines[i], lines[i+1], lines[i+2]
 		for _, char := range first {
 			set[char] = true
 		}
@@ -170,7 +172,7 @@ func (s Solution) Year2022Day3(input string) (int, int) {
 }
 
 func (s Solution) Year2022Day4(input string) (int, int) {
-	strArr := readFile(input)
+	lines := ReadFile(input)
 	type interval struct {
 		s, e int
 	}
@@ -180,7 +182,7 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 	}
 
 	numContained := 0
-	for _, line := range strArr {
+	for _, line := range lines {
 		sections := strings.Split(line, ",")
 		inter := strings.Split(sections[0], "-")
 		start1, err := strconv.Atoi(inter[0])
@@ -204,7 +206,7 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 	}
 
 	numOverlap := 0
-	for _, line := range strArr {
+	for _, line := range lines {
 		sections := strings.Split(line, ",")
 		inter := strings.Split(sections[0], "-")
 		start1, err := strconv.Atoi(inter[0])
@@ -226,7 +228,7 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 }
 
 func (s Solution) Year2022Day5(input string) (string, string) {
-	strArr := readFile(input)
+	lines := ReadFile(input)
 
 	// STACKS
 	//             [L] [M]         [M]
@@ -251,7 +253,7 @@ func (s Solution) Year2022Day5(input string) (string, string) {
 	}
 	// PROCESS MOVES
 	// ex: move 7 from 3 to 9
-	for _, line := range strArr {
+	for _, line := range lines {
 		tokens := strings.Split(line, " ")
 		count, err := strconv.Atoi(tokens[1])
 		check(err)
@@ -285,7 +287,7 @@ func (s Solution) Year2022Day5(input string) (string, string) {
 		{"P", "G", "L", "T", "D", "V", "C", "M"},
 		{"W", "Q", "N", "J", "F", "M", "L"},
 	}
-	for _, line := range strArr {
+	for _, line := range lines {
 		tokens := strings.Split(line, " ")
 		count, err := strconv.Atoi(tokens[1])
 		check(err)
@@ -306,7 +308,38 @@ func (s Solution) Year2022Day5(input string) (string, string) {
 	return strings.Join(resArr1, ""), strings.Join(resArr2, "")
 }
 
-func readFile(filename string) []string {
+func (s Solution) Year2022Day6(input string) (int, int) {
+	lines := ReadFile(input)
+
+	check := func(alphaList []int) bool {
+		for _, el := range alphaList {
+			if el > 1 {
+				return false
+			}
+		}
+		return true
+	}
+	calcValue := func(size int) int {
+		for _, str := range lines {
+			alphaList := make([]int, 256)
+			for i := range str {
+				if i < size {
+					alphaList[str[i]] += 1
+					continue
+				}
+				if check(alphaList) {
+					return i
+				}
+				alphaList[str[i]] += 1
+				alphaList[str[i-size]] -= 1
+			}
+		}
+		return 0
+	}
+	return calcValue(4), calcValue(14)
+}
+
+func ReadFile(filename string) []string {
 	var lines []string
 	readFile, err := os.Open(filename)
 	check(err)
