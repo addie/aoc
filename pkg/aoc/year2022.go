@@ -1,6 +1,7 @@
 package aoc
 
 import (
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -319,10 +320,19 @@ func (s Solution) Year2022Day6(input string) (int, int) {
 	return calcValue(4), calcValue(14)
 }
 
+// Year2022Day7 traverses the file system using the input
+// and tracks the current working directory in an array and
+// the size of each file in a map. Each time that we
+// hit a file in the traversal, we add the file and its size
+// to the map and we add the size to each parent directory in
+// the map.
+//
+// For example if the current path is [/,a,b,c.txt] the algorithm
+// adds the size of c.txt to //, //a, //a/b in the map.
 func (s Solution) Year2022Day7(input string) (int, int) {
-	lines := ReadFile(input)
 	var path []string
 	sizeMap := make(map[string]int)
+	lines := ReadFile(input)
 	for _, line := range lines {
 		tokens := strings.Split(line, " ")
 		if tokens[1] == "ls" || tokens[0] == "dir" {
@@ -337,7 +347,9 @@ func (s Solution) Year2022Day7(input string) (int, int) {
 			// process files
 			size := Must(strconv.Atoi(tokens[0]))
 			for i := 1; i < len(path)+1; i++ {
-				sizeMap[strings.Join(path[:i], "/")] += size
+				filePath := strings.Join(path[:i], "/")
+				fmt.Println(filePath)
+				sizeMap[filePath] += size
 			}
 		}
 	}
