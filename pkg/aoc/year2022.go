@@ -1,7 +1,6 @@
 package aoc
 
 import (
-	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -336,11 +335,7 @@ func (s Solution) Year2022Day7(input string) (int, int) {
 			}
 		} else {
 			// process files
-			size, err := strconv.Atoi(tokens[0])
-			if err != nil {
-				fmt.Printf("ignoring %s\n", line)
-				continue
-			}
+			size := Must(strconv.Atoi(tokens[0]))
 			for i := 1; i < len(path)+1; i++ {
 				sizeMap[strings.Join(path[:i], "/")] += size
 			}
