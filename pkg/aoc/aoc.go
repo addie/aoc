@@ -17,9 +17,9 @@ func Run(y, d string) (any, any) {
 	return s.Execute()
 }
 
-func saveData(day int) string {
+func saveData(day, year int) string {
 	filename := fmt.Sprintf(data.Filename, day)
-	err := data.Get(day, filename)
+	err := data.Get(day, year, filename)
 	if err != nil {
 		log.Fatal(err)
 	}

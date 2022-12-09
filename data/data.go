@@ -42,11 +42,11 @@ func Post(day, level, result int) error {
 	return nil
 }
 
-func Get(day int, filename string) error {
+func Get(day, year int, filename string) error {
 	config := &Configuration{
 		SessionCookie: secret.SessionID,
 		Output:        filename,
-		Year:          2022,
+		Year:          year,
 		Day:           day,
 	}
 

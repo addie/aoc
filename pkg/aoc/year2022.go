@@ -327,8 +327,8 @@ func (s Solution) Year2022Day6(input string) (int, int) {
 // to the map and we add the size to each parent directory in
 // the map.
 //
-// For example if the current path is [/,a,b,c.txt] the algorithm
-// adds the size of c.txt to //, //a, //a/b in the map.
+// For example if the current path is [/,a,b,abc.txt] the algorithm
+// adds the size of abc.txt to //, //a, //a/b in the map.
 func (s Solution) Year2022Day7(input string) (int, int) {
 	var path []string
 	sizeMap := make(map[string]int)
@@ -370,4 +370,219 @@ func (s Solution) Year2022Day7(input string) (int, int) {
 		}
 	}
 	return res1, candidateSize
+}
+
+func (s Solution) Year2022Day8(input string) (int, int) {
+	var grid [][]int
+	// demo := []string{"30373", "25512", "65332", "33549", "35390"}
+	lines := ReadFile(input)
+	for _, line := range lines {
+		var row []int
+		for _, c := range line {
+			row = append(row, Must(strconv.Atoi(string(c))))
+		}
+		grid = append(grid, row)
+	}
+	max := func(a int, b int) int {
+		if a > b {
+			return a
+		}
+		return b
+	}
+	type tuple struct{ horiz, vert int }
+	counted := make([][]bool, len(grid))
+	for i := range counted {
+		counted[i] = make([]bool, len(grid))
+	}
+
+	maxSoFar := make([][]tuple, len(grid))
+	for i := range maxSoFar {
+		maxSoFar[i] = make([]tuple, len(grid))
+	}
+	// from top left
+	for r := range grid {
+		for c := range grid {
+			if r == 0 && c == 0 {
+				maxSoFar[r][c].horiz = grid[r][c]
+				maxSoFar[r][c].vert = grid[r][c]
+			} else if r == 0 {
+				maxSoFar[r][c].horiz = max(maxSoFar[r][c-1].horiz, grid[r][c])
+				maxSoFar[r][c].vert = grid[r][c]
+			} else if c == 0 {
+				maxSoFar[r][c].horiz = grid[r][c]
+				maxSoFar[r][c].vert = max(maxSoFar[r-1][c].vert, grid[r][c])
+			} else {
+				maxSoFar[r][c].horiz = max(maxSoFar[r][c-1].horiz, grid[r][c])
+				maxSoFar[r][c].vert = max(maxSoFar[r-1][c].vert, grid[r][c])
+			}
+		}
+	}
+	visibleTrees := 0
+	for r := range grid {
+		for c := range grid {
+			if r == 0 || c == 0 ||
+				r == len(grid)-1 || c == len(grid)-1 ||
+				grid[r][c] > maxSoFar[r-1][c].vert ||
+				grid[r][c] > maxSoFar[r][c-1].horiz {
+				counted[r][c] = true
+				visibleTrees++
+			}
+		}
+	}
+	maxSoFar = make([][]tuple, len(grid))
+	for i := range maxSoFar {
+		maxSoFar[i] = make([]tuple, len(grid[0]))
+	}
+	// from bottom right
+	for r := len(grid) - 1; r >= 0; r-- {
+		for c := len(grid) - 1; c >= 0; c-- {
+			if r == len(grid)-1 && c == len(grid)-1 {
+				maxSoFar[r][c].horiz = grid[r][c]
+				maxSoFar[r][c].vert = grid[r][c]
+			} else if r == len(grid)-1 {
+				maxSoFar[r][c].horiz = max(maxSoFar[r][c+1].horiz, grid[r][c])
+				maxSoFar[r][c].vert = grid[r][c]
+			} else if c == len(grid)-1 {
+				maxSoFar[r][c].horiz = grid[r][c]
+				maxSoFar[r][c].vert = max(maxSoFar[r+1][c].vert, grid[r][c])
+			} else {
+				maxSoFar[r][c].horiz = max(maxSoFar[r][c+1].horiz, grid[r][c])
+				maxSoFar[r][c].vert = max(maxSoFar[r+1][c].vert, grid[r][c])
+			}
+		}
+	}
+	for r := len(grid) - 2; r > 0; r-- {
+		for c := len(grid) - 2; c > 0; c-- {
+			if counted[r][c] == false &&
+				(grid[r][c] > maxSoFar[r+1][c].vert ||
+					grid[r][c] > maxSoFar[r][c+1].horiz) {
+				visibleTrees++
+			}
+		}
+	}
+	// calc scenic scores from top left
+	scenicScores := make([][]int, len(grid))
+	for i := range scenicScores {
+		scenicScores[i] = make([]int, len(grid[0]))
+	}
+	calculateScore := func(grid [][]int, row, col int) int {
+		s1 := 0
+		r := row
+		for r > 0 {
+			s1++
+			if grid[r-1][col] >= grid[row][col] {
+				break
+			}
+			r--
+		}
+		s2 := 0
+		c := col
+		for c > 0 {
+			s2++
+			if grid[row][c-1] >= grid[row][col] {
+				break
+			}
+			c--
+		}
+		s3 := 0
+		r = row
+		for r < len(grid)-1 {
+			s3++
+			if grid[r+1][col] >= grid[row][col] {
+				break
+			}
+			r++
+		}
+		s4 := 0
+		c = col
+		for c < len(grid)-1 {
+			s4++
+			if grid[row][c+1] >= grid[row][col] {
+				break
+			}
+			c++
+		}
+		return s1 * s2 * s3 * s4
+	}
+	for r := range grid {
+		for c := range grid {
+			if r > 0 && c > 0 && r < len(grid)-1 && c < len(grid)-1 {
+				scenicScores[r][c] = calculateScore(grid, r, c)
+			}
+		}
+	}
+	maxScore := 0
+	for r := range scenicScores {
+		for c := range scenicScores {
+			if scenicScores[r][c] > maxScore {
+				maxScore = scenicScores[r][c]
+			}
+		}
+	}
+	return visibleTrees, maxScore
+}
+
+func (s Solution) Year2022Day9(input string) (int, int) {
+	type coord struct{ r, c int }
+	visited1 := make(map[coord]bool)
+	visited9 := make(map[coord]bool)
+	knots := []coord{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+	isTouching := func(head coord, tail coord) bool {
+		return math.Abs(float64(head.c)-float64(tail.c)) < 2 && math.Abs(float64(head.r)-float64(tail.r)) < 2
+	}
+	lines := ReadFile(input)
+	for _, line := range lines {
+		ins := strings.Split(line, " ")
+		dir, count := ins[0], Must(strconv.Atoi(ins[1]))
+		for move := 0; move < count; move++ {
+			for i := range knots {
+				if i == len(knots)-1 {
+					continue
+				}
+				if i == 0 {
+					switch dir {
+					case "R":
+						knots[i].c++
+					case "L":
+						knots[i].c--
+					case "U":
+						knots[i].r++
+					case "D":
+						knots[i].r--
+					}
+				}
+				touching := isTouching(knots[i], knots[i+1])
+				if !touching {
+					if knots[i].r > knots[i+1].r {
+						knots[i+1].r++
+					} else if knots[i].r < knots[i+1].r {
+						knots[i+1].r--
+					}
+					if knots[i].c > knots[i+1].c {
+						knots[i+1].c++
+					} else if knots[i].c < knots[i+1].c {
+						knots[i+1].c--
+					}
+				}
+				if i == 0 {
+					visited1[knots[i+1]] = true
+				} else if i == 8 {
+					visited9[knots[i+1]] = true
+				}
+			}
+		}
+	}
+	count1 := 0
+	for k := range visited1 {
+		if visited1[k] {
+			count1++
+		}
+	}
+	count9 := 0
+	for k := range visited9 {
+		if visited9[k] {
+			count9++
+		}
+	}
+	return count1, count9
 }
