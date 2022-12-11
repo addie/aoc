@@ -320,16 +320,16 @@ func (s Solution) Year2022Day6(input string) (int, int) {
 	return calcValue(4), calcValue(14)
 }
 
-// Year2022Day7 traverses the file system using the input
-// and tracks the current working directory in an array and
-// the size of each file in a map. Each time that we
-// hit a file in the traversal, we add the file and its size
-// to the map and we add the size to each parent directory in
-// the map.
-//
-// For example if the current path is [/,a,b,abc.txt] the algorithm
-// adds the size of abc.txt to //, //a, //a/b in the map.
 func (s Solution) Year2022Day7(input string) (int, int) {
+	// Year2022Day7 traverses the file system using the input
+	// and tracks the current working directory in an array and
+	// the size of each file in a map. Each time that we
+	// hit a file in the traversal, we add the file and its size
+	// to the map and we add the size to each parent directory in
+	// the map.
+	//
+	// For example if the current path is [/,a,b,abc.txt] the algorithm
+	// adds the size of abc.txt to //, //a, //a/b in the map.
 	var path []string
 	sizeMap := make(map[string]int)
 	lines := ReadFile(input)
@@ -585,4 +585,76 @@ func (s Solution) Year2022Day9(input string) (int, int) {
 		}
 	}
 	return count1, count9
+}
+func (s Solution) Year2022Day10(input string) (int, int) {
+	lines := ReadFile(input)
+	type instr struct {
+		cmd string
+		arg int
+	}
+
+	getSignalStrength := func(clock int, X int) int {
+		signalStrength := 0
+		switch clock {
+		case 20:
+			signalStrength = clock * X
+		case 60:
+			signalStrength = clock * X
+		case 100:
+			signalStrength = clock * X
+		case 140:
+			signalStrength = clock * X
+		case 180:
+			signalStrength = clock * X
+		case 220:
+			signalStrength = clock * X
+		}
+		return signalStrength
+	}
+	var instructions []instr
+	for _, line := range lines {
+		s := strings.Split(line, " ")
+		instructions = append(instructions, instr{cmd: s[0]})
+		if len(s) > 1 {
+			instructions[len(instructions)-1].arg = Must(strconv.Atoi(s[1]))
+		}
+	}
+	drawPixel := func(screen [][]string, clock, X int) {
+		row := clock / 40
+		pos := clock % 40
+		if X-1 == pos || X == pos || X+1 == pos {
+			screen[row][pos] = "#"
+		} else {
+			screen[row][pos] = "."
+		}
+	}
+	clock := 1
+	ins := 0
+	argComplete := false
+	totalSignalStrength := 0
+	X := 1
+	screen := make([][]string, 6)
+	for i := range screen {
+		row := make([]string, 40)
+		screen[i] = row
+	}
+	for ins < len(instructions) {
+		drawPixel(screen, clock-1, X)
+		curr := instructions[ins]
+		if curr.cmd == "noop" {
+			ins++
+		} else if !argComplete {
+			argComplete = !argComplete
+		} else {
+			argComplete = !argComplete
+			X += instructions[ins].arg
+			ins++
+		}
+		clock++
+		totalSignalStrength += getSignalStrength(clock, X)
+	}
+	for _, row := range screen {
+		fmt.Println(row)
+	}
+	return totalSignalStrength, 0
 }
