@@ -592,24 +592,11 @@ func (s Solution) Year2022Day10(input string) (int, int) {
 		cmd string
 		arg int
 	}
-
 	getSignalStrength := func(clock int, X int) int {
-		signalStrength := 0
-		switch clock {
-		case 20:
-			signalStrength = clock * X
-		case 60:
-			signalStrength = clock * X
-		case 100:
-			signalStrength = clock * X
-		case 140:
-			signalStrength = clock * X
-		case 180:
-			signalStrength = clock * X
-		case 220:
-			signalStrength = clock * X
+		if clock%40-20 != 0 {
+			return 0
 		}
-		return signalStrength
+		return clock * X
 	}
 	var instructions []instr
 	for _, line := range lines {

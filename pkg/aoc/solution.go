@@ -41,3 +41,12 @@ func (s Solution) dataFilename() string {
 func (s Solution) methodName() string {
 	return fmt.Sprintf("Year%dDay%d", s.year, s.day)
 }
+
+func in[T comparable](val T, container []T) bool {
+	for _, v := range container {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
