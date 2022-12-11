@@ -325,7 +325,7 @@ func (s Solution) Year2022Day7(input string) (int, int) {
 	// and tracks the current working directory in an array and
 	// the size of each file in a map. Each time that we
 	// hit a file in the traversal, we add the file and its size
-	// to the map and we add the size to each parent directory in
+	// to the map, and we add the size to each parent directory in
 	// the map.
 	//
 	// For example if the current path is [/,a,b,abc.txt] the algorithm
@@ -586,7 +586,7 @@ func (s Solution) Year2022Day9(input string) (int, int) {
 	}
 	return count1, count9
 }
-func (s Solution) Year2022Day10(input string) (int, int) {
+func (s Solution) Year2022Day10(input string) (int, [][]string) {
 	lines := ReadFile(input)
 	type instr struct {
 		cmd string
@@ -610,9 +610,9 @@ func (s Solution) Year2022Day10(input string) (int, int) {
 		row := clock / 40
 		pos := clock % 40
 		if X-1 == pos || X == pos || X+1 == pos {
-			screen[row][pos] = "#"
+			screen[row][pos] = "0"
 		} else {
-			screen[row][pos] = "."
+			screen[row][pos] = " "
 		}
 	}
 	clock := 1
@@ -640,8 +640,5 @@ func (s Solution) Year2022Day10(input string) (int, int) {
 		clock++
 		totalSignalStrength += getSignalStrength(clock, X)
 	}
-	for _, row := range screen {
-		fmt.Println(row)
-	}
-	return totalSignalStrength, 0
+	return totalSignalStrength, screen
 }
