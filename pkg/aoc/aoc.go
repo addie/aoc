@@ -10,7 +10,7 @@ import (
 func Run(y, d string) (any, any) {
 	year := Must(strconv.Atoi(y))
 	day := Must(strconv.Atoi(d))
-	s := Solution{
+	s := Solution[int]{
 		year: year,
 		day:  day,
 	}

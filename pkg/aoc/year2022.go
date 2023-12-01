@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func (s Solution) Year2022Day1(input string) (int, int) {
+func (s Solution[T]) Year2022Day1(input string) (int, int) {
 	lines := ReadFile(input)
 
 	currentTotal := 0
@@ -30,7 +30,7 @@ func (s Solution) Year2022Day1(input string) (int, int) {
 	return maxTotal, top3
 }
 
-func (s Solution) Year2022Day2(input string) (int, int) {
+func (s Solution[T]) Year2022Day2(input string) (int, int) {
 	lines := ReadFile(input)
 
 	// Opp A for Rock, B for Paper, and C for Scissors
@@ -101,7 +101,7 @@ func (s Solution) Year2022Day2(input string) (int, int) {
 	return part1Total, part2Total
 }
 
-func (s Solution) Year2022Day3(input string) (int, int) {
+func (s Solution[T]) Year2022Day3(input string) (int, int) {
 	lines := ReadFile(input)
 	// Lowercase item types a through z have priorities 1 through 26.
 	// Uppercase item types A through Z have priorities 27 through 52.
@@ -152,7 +152,7 @@ func (s Solution) Year2022Day3(input string) (int, int) {
 	return int(res1), int(res2)
 }
 
-func (s Solution) Year2022Day4(input string) (int, int) {
+func (s Solution[T]) Year2022Day4(input string) (int, int) {
 	lines := ReadFile(input)
 	type interval struct {
 		s, e int
@@ -200,7 +200,7 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 	return numContained, numOverlap
 }
 
-func (s Solution) Year2022Day5(input string) (string, string) {
+func (s Solution[T]) Year2022Day5(input string) (string, string) {
 	lines := ReadFile(input)
 
 	// STACKS
@@ -275,7 +275,7 @@ func (s Solution) Year2022Day5(input string) (string, string) {
 	return strings.Join(resArr1, ""), strings.Join(resArr2, "")
 }
 
-func (s Solution) Year2022Day6(input string) (int, int) {
+func (s Solution[T]) Year2022Day6(input string) (int, int) {
 	lines := ReadFile(input)
 
 	check := func(alphaList []int) bool {
@@ -306,7 +306,7 @@ func (s Solution) Year2022Day6(input string) (int, int) {
 	return calcValue(4), calcValue(14)
 }
 
-func (s Solution) Year2022Day7(input string) (int, int) {
+func (s Solution[T]) Year2022Day7(input string) (int, int) {
 	// Year2022Day7 traverses the file system using the input
 	// and tracks the current working directory in an array and
 	// the size of each file in a map. Each time that we
@@ -358,7 +358,7 @@ func (s Solution) Year2022Day7(input string) (int, int) {
 	return res1, candidateSize
 }
 
-func (s Solution) Year2022Day8(input string) (int, int) {
+func (s Solution[T]) Year2022Day8(input string) (int, int) {
 	var grid [][]int
 	// demo := []string{"30373", "25512", "65332", "33549", "35390"}
 	lines := ReadFile(input)
@@ -508,7 +508,7 @@ func (s Solution) Year2022Day8(input string) (int, int) {
 	return visibleTrees, maxScore
 }
 
-func (s Solution) Year2022Day9(input string) (int, int) {
+func (s Solution[T]) Year2022Day9(input string) (int, int) {
 	type coord struct{ r, c int }
 	visited1 := make(map[coord]bool)
 	visited9 := make(map[coord]bool)
@@ -573,7 +573,7 @@ func (s Solution) Year2022Day9(input string) (int, int) {
 	return count1, count9
 }
 
-func (s Solution) Year2022Day10(input string) (int, [][]string) {
+func (s Solution[T]) Year2022Day10(input string) (int, [][]string) {
 	lines := ReadFile(input)
 	type instr struct {
 		cmd string
@@ -630,7 +630,7 @@ func (s Solution) Year2022Day10(input string) (int, [][]string) {
 	return totalSignalStrength, screen
 }
 
-func (s Solution) Year2022Day11() (int, int) {
+func (s Solution[T]) Year2022Day11() (int, int) {
 	type monkeyType struct {
 		items                                   []int
 		opp                                     string
@@ -797,7 +797,7 @@ func (s Solution) Year2022Day11() (int, int) {
 	return monkeyBusiness[0], monkeyBusiness[1]
 }
 
-func (s Solution) Year2022Day12(input string) (int, int) {
+func (s Solution[T]) Year2022Day12(input string) (int, int) {
 	type coord struct{ r, c int }
 	st, en := coord{}, coord{}
 	var grid [][]rune

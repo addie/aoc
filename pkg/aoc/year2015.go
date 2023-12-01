@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (s Solution) Year2015Day1(input string) (int, int) {
+func (s Solution[T]) Year2015Day1(input string) (int, int) {
 	lines := ReadFile(input)
 	m := map[string]int{"(": 1, ")": -1}
 	res1, res2 := 0, 0
@@ -19,7 +19,7 @@ func (s Solution) Year2015Day1(input string) (int, int) {
 	return res1, res2
 }
 
-func (s Solution) Year2015Day2(input string) (int, int) {
+func (s Solution[T]) Year2015Day2(input string) (int, int) {
 	lines := ReadFile(input)
 	res1, res2 := 0, 0
 

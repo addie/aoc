@@ -17,7 +17,6 @@ var runCmd = &cobra.Command{
 	Short: "Runs the provided aoc algorithm",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-
 		res1, res2 := aoc.Run(args[0], args[1])
 		printResult(res1)
 		printResult(res2)

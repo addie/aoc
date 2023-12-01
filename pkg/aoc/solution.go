@@ -7,11 +7,11 @@ import (
 	"reflect"
 )
 
-type Solution struct {
+type Solution[T any] struct {
 	year, day int
 }
 
-func (s Solution) Execute() (any, any) {
+func (s Solution[T]) Execute() (any, any) {
 	inputs := []reflect.Value{reflect.ValueOf(s.dataFilename())}
 	res := reflect.ValueOf(s).MethodByName(s.methodName()).Call(inputs)
 	return res[0].Interface(), res[1].Interface()
@@ -29,11 +29,11 @@ func ReadFile(filename string) []string {
 	return lines
 }
 
-func (s Solution) dataFilename() string {
+func (s Solution[T]) dataFilename() string {
 	return fmt.Sprintf("data/year%dday%d.txt", s.year, s.day)
 }
 
-func (s Solution) methodName() string {
+func (s Solution[T]) methodName() string {
 	return fmt.Sprintf("Year%dDay%d", s.year, s.day)
 }
 

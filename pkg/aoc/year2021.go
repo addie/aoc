@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (s Solution) Year2021Day1(input string) (int, int) {
+func (s Solution[T]) Year2021Day1(input string) (int, int) {
 	lines := ReadFile(input)
 	numIncreases1 := 0
 	for i := range lines {
@@ -38,12 +38,12 @@ func (s Solution) Year2021Day1(input string) (int, int) {
 	return numIncreases1, numIncreases2
 }
 
-func (s Solution) Year2021Day2(input string) (int, int) {
-	lines := ReadFile(input)
+type pos struct {
+	horizontal, depth, aim int
+}
 
-	type pos struct {
-		horizontal, depth, aim int
-	}
+func (s Solution[T]) Year2021Day2(input string) (int, int) {
+	lines := ReadFile(input)
 
 	res := pos{}
 	for _, line := range lines {
@@ -78,7 +78,7 @@ func (s Solution) Year2021Day2(input string) (int, int) {
 	return res.horizontal * res.depth, res2.horizontal * res2.depth
 }
 
-func (s Solution) Year2021Day3(input string) (int, int) {
+func (s Solution[T]) Year2021Day3(input string) (int, int) {
 	const (
 		totalStrings = 1000
 		binLength    = 12
@@ -181,7 +181,7 @@ func (s Solution) Year2021Day3(input string) (int, int) {
 	return int(gamma) * int(epsilon), oxygen * co2
 }
 
-func (s Solution) Year2021Day4(input string) (int, int) {
+func (s Solution[T]) Year2021Day4(input string) (int, int) {
 	lines := ReadFile(input)
 	var moves []string
 	var boards [][][]string
@@ -303,7 +303,7 @@ func (s Solution) Year2021Day4(input string) (int, int) {
 	return sumWinner * lastMoveWinner, sumLoser * lastMoveLoser
 }
 
-func (s Solution) Year2021Day5(input string) (int, int) {
+func (s Solution[T]) Year2021Day5(input string) (int, int) {
 	type coord struct{ r, c int }
 	type coordPair struct{ start, end coord }
 
@@ -448,62 +448,62 @@ func (s Solution) Year2021Day5(input string) (int, int) {
 }
 
 //
-// func (s Solution) Year2021Day6(input string) (int, int) {
+// func (s Solution[T]) Year2021Day6(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day7(input string) (int, int) {
+// func (s Solution[T]) Year2021Day7(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day8(input string) (int, int) {
+// func (s Solution[T]) Year2021Day8(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day9(input string) (int, int) {
+// func (s Solution[T]) Year2021Day9(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day10(input string) (int, int) {
+// func (s Solution[T]) Year2021Day10(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day11(input string) (int, int) {
+// func (s Solution[T]) Year2021Day11(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day12(input string) (int, int) {
+// func (s Solution[T]) Year2021Day12(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day13(input string) (int, int) {
+// func (s Solution[T]) Year2021Day13(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day14(input string) (int, int) {
+// func (s Solution[T]) Year2021Day14(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day15(input string) (int, int) {
+// func (s Solution[T]) Year2021Day15(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day16(input string) (int, int) {
+// func (s Solution[T]) Year2021Day16(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
 //
-// func (s Solution) Year2021Day17(input string) (int, int) {
+// func (s Solution[T]) Year2021Day17(input string) (int, int) {
 // 	lines := ReadFile(input)
 //
 // }
