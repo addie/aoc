@@ -2,6 +2,7 @@ package aoc
 
 import (
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -36,57 +37,32 @@ func year2023Day1Part1(data []string) int {
 }
 
 func year2023Day1Part2(data []string) int {
-	numMap, trie1, trie2 := createDataStructures()
+	var numMap = map[string]int{
+		"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+		"six": 6, "seven": 7, "eight": 8, "nine": 9,
+	}
 	res := 0
 	for _, line := range data {
-		firstDigit := findDigit(numMap, trie1, line)
-		lastDigit := findDigit(numMap, trie2, line, true)
-		curr := firstDigit*10 + lastDigit
+		digits := findDigits(numMap, line)
+		curr := digits[0]*10 + digits[len(digits)-1]
 		res += curr
 	}
 	return res
 }
 
-func createDataStructures() (map[string]int, *Trie, *Trie) {
-	var numMap = map[string]int{
-		"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
-		"six": 6, "seven": 7, "eight": 8, "nine": 9,
-	}
-	trie := NewTrie()
-	for num := range numMap {
-		trie.Insert(num)
-		trie.Insert(Reversed(num))
-	}
-	trie2 := NewTrie()
-	for num := range numMap {
-		trie2.InsertReversed(num)
-	}
-	return numMap, trie, trie2
-}
-
-func findDigit(numMap map[string]int, trie *Trie, line string, reversed ...bool) int {
-	if reversed != nil && reversed[0] {
-		line = Reversed(line)
-	}
-	digit := 0
-	var soFar string
-	for _, char := range line {
+func findDigits(numMap map[string]int, line string) []int {
+	var digits []int
+	for i, char := range line {
 		if unicode.IsDigit(char) {
 			val, _ := strconv.Atoi(string(char))
-			return val
+			digits = append(digits, val)
+			continue
 		}
-		soFar += string(char)
-		isValid := trie.StartsWith(soFar)
-		isComplete := trie.Search(soFar)
-		if isComplete {
-			if reversed != nil && reversed[0] {
-				soFar = Reversed(soFar)
+		for k := range numMap {
+			if strings.HasPrefix(line[i:], k) {
+				digits = append(digits, numMap[k])
 			}
-			return numMap[soFar]
-		}
-		if !isValid {
-			soFar = string(char)
 		}
 	}
-	return digit
+	return digits
 }
