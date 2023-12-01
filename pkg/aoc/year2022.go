@@ -166,15 +166,11 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 	for _, line := range lines {
 		sections := strings.Split(line, ",")
 		inter := strings.Split(sections[0], "-")
-		start1, err := strconv.Atoi(inter[0])
-		check(err)
-		end1, err := strconv.Atoi(inter[1])
-		check(err)
+		start1 := Must(strconv.Atoi(inter[0]))
+		end1 := Must(strconv.Atoi(inter[1]))
 		inter = strings.Split(sections[1], "-")
-		start2, err := strconv.Atoi(inter[0])
-		check(err)
-		end2, err := strconv.Atoi(inter[1])
-		check(err)
+		start2 := Must(strconv.Atoi(inter[0]))
+		end2 := Must(strconv.Atoi(inter[1]))
 
 		int1, int2 := interval{s: start1, e: end1}, interval{s: start2, e: end2}
 		if contained(int1, int2) || contained(int2, int1) {
@@ -190,15 +186,11 @@ func (s Solution) Year2022Day4(input string) (int, int) {
 	for _, line := range lines {
 		sections := strings.Split(line, ",")
 		inter := strings.Split(sections[0], "-")
-		start1, err := strconv.Atoi(inter[0])
-		check(err)
-		end1, err := strconv.Atoi(inter[1])
-		check(err)
+		start1 := Must(strconv.Atoi(inter[0]))
+		end1 := Must(strconv.Atoi(inter[1]))
 		inter = strings.Split(sections[1], "-")
-		start2, err := strconv.Atoi(inter[0])
-		check(err)
-		end2, err := strconv.Atoi(inter[1])
-		check(err)
+		start2 := Must(strconv.Atoi(inter[0]))
+		end2 := Must(strconv.Atoi(inter[1]))
 
 		int1, int2 := interval{s: start1, e: end1}, interval{s: start2, e: end2}
 		if overlap(int1, int2) || overlap(int2, int1) {
@@ -236,12 +228,9 @@ func (s Solution) Year2022Day5(input string) (string, string) {
 	// ex: move 7 from 3 to 9
 	for _, line := range lines {
 		tokens := strings.Split(line, " ")
-		count, err := strconv.Atoi(tokens[1])
-		check(err)
-		start, err := strconv.Atoi(tokens[3])
-		check(err)
-		end, err := strconv.Atoi(tokens[5])
-		check(err)
+		count := Must(strconv.Atoi(tokens[1]))
+		start := Must(strconv.Atoi(tokens[3]))
+		end := Must(strconv.Atoi(tokens[5]))
 
 		i := 0
 		for i < count {
@@ -270,12 +259,9 @@ func (s Solution) Year2022Day5(input string) (string, string) {
 	}
 	for _, line := range lines {
 		tokens := strings.Split(line, " ")
-		count, err := strconv.Atoi(tokens[1])
-		check(err)
-		start, err := strconv.Atoi(tokens[3])
-		check(err)
-		end, err := strconv.Atoi(tokens[5])
-		check(err)
+		count := Must(strconv.Atoi(tokens[1]))
+		start := Must(strconv.Atoi(tokens[3]))
+		end := Must(strconv.Atoi(tokens[5]))
 
 		subStack := stacks[start-1][len(stacks[start-1])-count:]
 		stacks[start-1] = stacks[start-1][:len(stacks[start-1])-count]
@@ -383,7 +369,7 @@ func (s Solution) Year2022Day8(input string) (int, int) {
 		}
 		grid = append(grid, row)
 	}
-	max := func(a int, b int) int {
+	mx := func(a int, b int) int {
 		if a > b {
 			return a
 		}
@@ -406,14 +392,14 @@ func (s Solution) Year2022Day8(input string) (int, int) {
 				maxSoFar[r][c].horiz = grid[r][c]
 				maxSoFar[r][c].vert = grid[r][c]
 			} else if r == 0 {
-				maxSoFar[r][c].horiz = max(maxSoFar[r][c-1].horiz, grid[r][c])
+				maxSoFar[r][c].horiz = mx(maxSoFar[r][c-1].horiz, grid[r][c])
 				maxSoFar[r][c].vert = grid[r][c]
 			} else if c == 0 {
 				maxSoFar[r][c].horiz = grid[r][c]
-				maxSoFar[r][c].vert = max(maxSoFar[r-1][c].vert, grid[r][c])
+				maxSoFar[r][c].vert = mx(maxSoFar[r-1][c].vert, grid[r][c])
 			} else {
-				maxSoFar[r][c].horiz = max(maxSoFar[r][c-1].horiz, grid[r][c])
-				maxSoFar[r][c].vert = max(maxSoFar[r-1][c].vert, grid[r][c])
+				maxSoFar[r][c].horiz = mx(maxSoFar[r][c-1].horiz, grid[r][c])
+				maxSoFar[r][c].vert = mx(maxSoFar[r-1][c].vert, grid[r][c])
 			}
 		}
 	}
@@ -440,14 +426,14 @@ func (s Solution) Year2022Day8(input string) (int, int) {
 				maxSoFar[r][c].horiz = grid[r][c]
 				maxSoFar[r][c].vert = grid[r][c]
 			} else if r == len(grid)-1 {
-				maxSoFar[r][c].horiz = max(maxSoFar[r][c+1].horiz, grid[r][c])
+				maxSoFar[r][c].horiz = mx(maxSoFar[r][c+1].horiz, grid[r][c])
 				maxSoFar[r][c].vert = grid[r][c]
 			} else if c == len(grid)-1 {
 				maxSoFar[r][c].horiz = grid[r][c]
-				maxSoFar[r][c].vert = max(maxSoFar[r+1][c].vert, grid[r][c])
+				maxSoFar[r][c].vert = mx(maxSoFar[r+1][c].vert, grid[r][c])
 			} else {
-				maxSoFar[r][c].horiz = max(maxSoFar[r][c+1].horiz, grid[r][c])
-				maxSoFar[r][c].vert = max(maxSoFar[r+1][c].vert, grid[r][c])
+				maxSoFar[r][c].horiz = mx(maxSoFar[r][c+1].horiz, grid[r][c])
+				maxSoFar[r][c].vert = mx(maxSoFar[r+1][c].vert, grid[r][c])
 			}
 		}
 	}
@@ -586,6 +572,7 @@ func (s Solution) Year2022Day9(input string) (int, int) {
 	}
 	return count1, count9
 }
+
 func (s Solution) Year2022Day10(input string) (int, [][]string) {
 	lines := ReadFile(input)
 	type instr struct {
@@ -641,4 +628,223 @@ func (s Solution) Year2022Day10(input string) (int, [][]string) {
 		totalSignalStrength += getSignalStrength(clock, X)
 	}
 	return totalSignalStrength, screen
+}
+
+func (s Solution) Year2022Day11() (int, int) {
+	type monkeyType struct {
+		items                                   []int
+		opp                                     string
+		val, test, ifTrue, ifFalse, inspections int
+	}
+	// demo data
+	demoMonkeys := []monkeyType{
+		{items: []int{79, 98}, opp: "*", val: 19, test: 23, ifTrue: 2, ifFalse: 3},
+		{items: []int{54, 65, 75, 74}, opp: "+", val: 6, test: 19, ifTrue: 2, ifFalse: 0},
+		{items: []int{79, 60, 97}, opp: "*", val: -1, test: 13, ifTrue: 1, ifFalse: 3},
+		{items: []int{74}, opp: "+", val: 3, test: 17, ifTrue: 0, ifFalse: 1},
+	}
+	_ = demoMonkeys // compile if unused
+	// monkeys data
+	monkeysData := []monkeyType{{
+		items: []int{62, 92, 50, 63, 62, 93, 73, 50}, opp: "*", val: 7, test: 2, ifTrue: 7, ifFalse: 1}, {
+		items: []int{51, 97, 74, 84, 99}, opp: "+", val: 3, test: 7, ifTrue: 2, ifFalse: 4}, {
+		items: []int{98, 86, 62, 76, 51, 81, 95}, opp: "+", val: 4, test: 13, ifTrue: 5, ifFalse: 4}, {
+		items: []int{53, 95, 50, 85, 83, 72}, opp: "+", val: 5, test: 19, ifTrue: 6, ifFalse: 0}, {
+		items: []int{59, 60, 63, 71}, opp: "*", val: 5, test: 11, ifTrue: 5, ifFalse: 3}, {
+		items: []int{92, 65}, opp: "*", val: -1, test: 5, ifTrue: 6, ifFalse: 3}, {
+		items: []int{78}, opp: "+", val: 8, test: 3, ifTrue: 0, ifFalse: 7}, {
+		items: []int{84, 93, 54}, opp: "+", val: 1, test: 17, ifTrue: 2, ifFalse: 1}}
+	_ = monkeysData // compile if unused
+
+	op := func(item int, opp string, value int) int {
+		if value < 0 {
+			value = item
+		}
+		if opp == "*" {
+			return item * value
+		}
+		return item + value
+	}
+	inspect := func(m monkeyType, item int, part int) (int, int) {
+		item = op(item, m.opp, m.val)
+		if part == 1 {
+			item = item / 3
+		}
+		if item%m.test == 0 {
+			return item, m.ifTrue
+		}
+		return item, m.ifFalse
+	}
+
+	var monkeyBusiness []int
+
+	// PART 1
+	monkeys := make([]monkeyType, len(monkeysData))
+	copy(monkeys, monkeysData)
+	round := 0
+	for round < 20 {
+		for curr := range monkeys {
+			for range monkeys[curr].items {
+				item := monkeys[curr].items[0]
+				monkeys[curr].items = monkeys[curr].items[1:]
+				updatedItem, next := inspect(monkeys[curr], item, 1)
+				monkeys[next].items = append(monkeys[next].items, updatedItem)
+				monkeys[curr].inspections++
+			}
+		}
+		round++
+		fmt.Printf("After round %d, the monkeys are holding items with these worry levels:\n", round)
+		for i, m := range monkeys {
+			fmt.Printf("Monkey %d: %v\n", i, m.items)
+		}
+		fmt.Println()
+	}
+	for i, m := range monkeys {
+		fmt.Printf("Monkey %d: inspected items %d times\n", i, m.inspections)
+	}
+	fmt.Println()
+	sort.Slice(monkeys, func(i, j int) bool {
+		return monkeys[i].inspections > monkeys[j].inspections
+	})
+	monkeyBusiness = append(monkeyBusiness, monkeys[0].inspections*monkeys[1].inspections)
+
+	// PART 2
+	monkeys = make([]monkeyType, len(monkeysData))
+	copy(monkeys, monkeysData)
+	round = 0
+	for round < 10000 {
+		for curr := range monkeys {
+			for range monkeys[curr].items {
+				item := monkeys[curr].items[0]
+				monkeys[curr].items = monkeys[curr].items[1:]
+				updatedItem, next := inspect(monkeys[curr], item, 2)
+				monkeys[next].items = append(monkeys[next].items, updatedItem)
+				monkeys[curr].inspections++
+			}
+		}
+		round++
+		if round == 1 || round == 20 || round%1000 == 0 {
+			fmt.Println("== After round", round, "==")
+			for i, m := range monkeys {
+				fmt.Printf("Monkey %d inspected items %d times\n", i, m.inspections)
+			}
+			fmt.Println()
+		}
+	}
+	sort.Slice(monkeys, func(i, j int) bool {
+		return monkeys[i].inspections > monkeys[j].inspections
+	})
+	monkeyBusiness = append(monkeyBusiness, monkeys[0].inspections*monkeys[1].inspections)
+
+	// for _, part := range []int{1, 2} {
+	// 	M := make([]monkeyType, len(monkeysData))
+	// 	copy(M, monkeysData)
+	// 	round := 0
+	// 	maxRound := 20
+	// 	if part == 2 {
+	// 		maxRound = 10000
+	// 	}
+	// 	for round < maxRound {
+	// 		for m := range M {
+	// 			for _, item := range M[m].items {
+	// 				M[m].inspections++
+	// 				item = op(m.items[0], m.opp, m.val)
+	// 				m := M[curr]
+	// 				M[curr].items = M[curr].items[1:]
+	// 				M[curr].items[0] = op(m.items[0], m.opp, m.val)
+	// 				if part == 1 {
+	// 					M[curr].items[0] /= 3
+	// 				}
+	// 				next := m.ifFalse
+	// 				if m.items[0]%m.test == 0 {
+	// 					next = m.ifTrue
+	// 				}
+	// 				M[next].items = append(M[next].items, M[curr].items[0])
+	// 			}
+	// 		}
+	// 		/*
+	// 			item = op(item, m.opp, m.val)
+	// 				if part == 1 {
+	// 					item = item / 3
+	// 				}
+	// 				if item%m.test == 0 {
+	// 					return item, m.ifTrue
+	// 				}
+	// 				return item, m.ifFalse
+	// 		*/
+	// 		round++
+	// 		debug := false
+	// 		if debug {
+	// 			fmt.Printf("After round %d, the monkeys are holding items with these worry levels:\n", round)
+	// 			for i, m := range M {
+	// 				fmt.Printf("Monkey %d: %v\n", i, m.items)
+	// 			}
+	// 			fmt.Println()
+	// 			if round == 1 || round == 20 || round%1000 == 0 {
+	// 				fmt.Println("== After round", round, "==")
+	// 				for i, m := range M {
+	// 					fmt.Printf("Monkey %d inspected items %d times\n", i, m.inspections)
+	// 				}
+	// 				fmt.Println()
+	// 			}
+	// 		}
+	// 	}
+	// 	sort.Slice(M, func(i, j int) bool {
+	// 		return M[i].inspections > M[j].inspections
+	// 	})
+	// 	monkeyBusiness = append(monkeyBusiness, M[0].inspections*M[1].inspections)
+	// }
+	return monkeyBusiness[0], monkeyBusiness[1]
+}
+
+func (s Solution) Year2022Day12(input string) (int, int) {
+	type coord struct{ r, c int }
+	st, en := coord{}, coord{}
+	var grid [][]rune
+	lines := ReadFile(input)
+	for r, line := range lines {
+		var row []rune
+		for c, col := range line {
+			if col == 'S' {
+				st = coord{r, c}
+				row = append(row, 'a')
+			} else if col == 'E' {
+				en = coord{r, c}
+				row = append(row, 'z')
+			} else {
+				row = append(row, col)
+			}
+		}
+		grid = append(grid, row)
+	}
+	fmt.Println(st, en)
+	// shortest path
+	type vertex struct {
+		coord coord
+		path  []coord
+	}
+	visited := make(map[coord]bool)
+	q := []vertex{{st, []coord{st}}}
+	var path []coord
+	for len(q) > 0 {
+		vert := popleft(&q)
+		visited[vert.coord] = true
+		for _, dir := range []coord{{0, 1}, {0, -1}, {1, 0}, {-1, 0}} {
+			node := coord{vert.coord.r + dir.r, vert.coord.c + dir.c}
+			if node == en {
+				vert.path = append(vert.path, en)
+				path = vert.path
+				goto end
+			}
+			if _, ok := visited[node]; !ok {
+				if node.r >= 0 && node.r < len(grid) && node.c >= 0 && node.c < len(grid[0]) {
+					q = append(q, vertex{node, append(vert.path, node)})
+				}
+			}
+		}
+	}
+end:
+	fmt.Println(path)
+	fmt.Println(len(path))
+	return 0, 0
 }

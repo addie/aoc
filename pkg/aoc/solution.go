@@ -19,13 +19,8 @@ func (s Solution) Execute() (any, any) {
 
 func ReadFile(filename string) []string {
 	var lines []string
-	readFile, err := os.Open(filename)
-	check(err)
-	defer func(readFile *os.File) {
-		err := readFile.Close()
-		check(err)
-	}(readFile)
-
+	readFile := Must(os.Open(filename))
+	defer readFile.Close()
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
 	for fileScanner.Scan() {
@@ -49,4 +44,23 @@ func in[T comparable](val T, container []T) bool {
 		}
 	}
 	return false
+}
+
+func pop[T any](alist *[]T) T {
+	f := len(*alist)
+	rv := (*alist)[f-1]
+	*alist = (*alist)[:f-1]
+	return rv
+}
+
+func popleft[T any](alist *[]T) T {
+	lv := (*alist)[0]
+	*alist = (*alist)[1:]
+	return lv
+}
+
+func printGrid[T any](grid [][]T) {
+	for _, row := range grid {
+		fmt.Println(row)
+	}
 }

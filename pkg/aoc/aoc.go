@@ -33,7 +33,7 @@ func post(day, level, res int) {
 	}
 }
 
-func Must(i int, err error) int {
+func Must[T any](i T, err error) T {
 	if err != nil {
 		log.Fatal(err)
 	}

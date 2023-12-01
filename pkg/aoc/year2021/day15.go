@@ -1,8 +1,6 @@
 package aoc
 
 import (
-	"aoc2021/aoc/new"
-	"aoc2021/clipboard"
 	"bufio"
 	"os"
 	"strconv"
@@ -18,7 +16,10 @@ func Day15() int {
 	file, _ := os.Open(day15Filename)
 	defer file.Close()
 
-	grid := new.IntGrid(gridSize)
+	grid := make([][]int, gridSize)
+	for i := range grid {
+		grid[i] = make([]int, gridSize)
+	}
 	row := 0
 
 	scanner := bufio.NewScanner(file)
@@ -31,7 +32,10 @@ func Day15() int {
 		row++
 	}
 
-	memo := new.IntGrid(memoSize)
+	memo := make([][]int, memoSize)
+	for i := range grid {
+		memo[i] = make([]int, memoSize)
+	}
 	for c := 1; c < memoSize; c++ {
 		gridValue := calcValue(grid, 0, c)
 		memo[0][c] = gridValue + memo[0][c-1]
@@ -54,8 +58,8 @@ func Day15() int {
 		}
 		allStrs = append(allStrs, strings.Join(strs, ","))
 	}
-	res := strings.Join(allStrs, "\n")
-	clipboard.WriteAll(res)
+	// res := strings.Join(allStrs, "\n")
+	// clipboard.WriteAll(res)
 	return memo[len(memo)-1][len(memo[0])-1]
 }
 
