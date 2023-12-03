@@ -153,10 +153,120 @@ func (s Solution[T]) Year2023Day3(_ string) (int, int) {
 	return res1, res2
 }
 
+func isDigit(s string) bool { return strings.ContainsAny(s, "0123456789") }
+
 func year2023Day3Part1(data []string) int {
-	return 0
+	checkPartNumber := func(grid [][]string, r, c int) bool {
+		directions := []coord{{r: 0, c: 1}, {r: 1, c: 0}, {r: 1, c: 1}, {r: -1, c: 0}, {r: 0, c: -1}, {r: -1, c: -1}, {r: -1, c: 1}, {r: 1, c: -1}}
+		for _, dir := range directions {
+			nc := coord{r: r + dir.r, c: c + dir.c}
+			if nc.r < 0 || nc.r >= len(grid) || nc.c < 0 || nc.c >= len(grid[0]) {
+				continue
+			}
+			if grid[nc.r][nc.c] != "." && !isDigit(grid[nc.r][nc.c]) {
+				return true
+			}
+		}
+		return false
+	}
+	nextIsDigit := func(grid [][]string, r, c int) bool {
+		if c+1 < len(grid[0]) && isDigit(grid[r][c+1]) {
+			return true
+		}
+		return false
+	}
+	grid := make([][]string, len(data))
+	for i := range data {
+		grid[i] = strings.Split(data[i], "")
+	}
+	var partNumbers []int
+	isPrevDigit := false
+	isPartNo := false
+	currDigit := ""
+	for r := range grid {
+		for c := range grid[r] {
+			cell := grid[r][c]
+			if isDigit(cell) {
+				currDigit += cell
+			} else {
+				currDigit = ""
+				isPrevDigit = false
+				isPartNo = false
+				continue
+			}
+			if !nextIsDigit(grid, r, c) {
+				if checkPartNumber(grid, r, c) {
+					isPartNo = true
+				}
+				if isPartNo {
+					partNumbers = append(partNumbers, Must(strconv.Atoi(currDigit)))
+					currDigit = ""
+					continue
+				}
+			}
+			if !isPrevDigit {
+				isPrevDigit = true
+				currDigit = cell
+				if checkPartNumber(grid, r, c) {
+					isPartNo = true
+				}
+				continue
+			} else {
+				if checkPartNumber(grid, r, c) {
+					isPartNo = true
+				}
+				continue
+			}
+		}
+		currDigit = ""
+		isPrevDigit = false
+		isPartNo = false
+	}
+	sumOfPartNos := 0
+	for _, partNo := range partNumbers {
+		sumOfPartNos += partNo
+	}
+	return sumOfPartNos
 }
 
 func year2023Day3Part2(data []string) int {
-	return 0
+	grid := make([][]string, len(data))
+	for i := range data {
+		grid[i] = strings.Split(data[i], "")
+	}
+	R, C := len(grid), len(grid[0])
+	nums := make(map[coord][]int)
+	for r := range grid {
+		gears := make(map[coord]struct{}) // positions of '*'
+		n := 0
+		for c := range grid[0] {
+			if c < C && isDigit(grid[r][c]) {
+				n = n*10 + Must(strconv.Atoi(grid[r][c]))
+				for _, rd := range []int{-1, 0, 1} {
+					for _, cd := range []int{-1, 0, 1} {
+						nr, nc := r+rd, c+cd
+						if nr >= 0 && nr < R && nc >= 0 && nc < C {
+							newRC := grid[nr][nc]
+							if newRC == "*" {
+								gears[coord{r: nr, c: nc}] = struct{}{}
+							}
+						}
+					}
+				}
+			} else if n > 0 {
+				for gear := range gears {
+					nums[gear] = append(nums[gear], n)
+				}
+				n = 0
+				gears = make(map[coord]struct{})
+			}
+		}
+	}
+	res := 0
+	for _, v := range nums {
+		if len(v) == 2 {
+			res += v[0] * v[1]
+		}
+	}
+	return res
 }
