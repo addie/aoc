@@ -1,5 +1,7 @@
 package aoc
 
+type coord struct{ r, c int }
+
 type TrieNode struct {
 	Children map[rune]*TrieNode
 	IsEnd    bool

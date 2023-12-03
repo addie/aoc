@@ -798,7 +798,6 @@ func (s Solution[T]) Year2022Day11() (int, int) {
 }
 
 func (s Solution[T]) Year2022Day12(input string) (int, int) {
-	type coord struct{ r, c int }
 	st, en := coord{}, coord{}
 	var grid [][]rune
 	lines := ReadFile(input)

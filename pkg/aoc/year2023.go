@@ -66,3 +66,82 @@ func findDigits(numMap map[string]int, line string) []int {
 	}
 	return digits
 }
+
+func (s Solution[T]) Year2023Day2(_ string) (int, int) {
+	data := ReadFile("data/year2023day2.txt")
+	res1 := year2023Day2Part1(data)
+	res2 := year2023Day2Part2(data)
+	return res1, res2
+}
+
+func year2023Day2Part1(data []string) int {
+	type Color int
+
+	const red Color = 12
+	const green Color = 13
+	const blue Color = 14
+
+	var colorMap = map[string]Color{
+		"red":   red,
+		"green": green,
+		"blue":  blue,
+	}
+
+	validGames := make([]bool, 0, len(data))
+	for _, game := range data {
+		gameValid := true
+		rounds := strings.Split(strings.Split(game, ":")[1], ";")
+		for _, rd := range rounds {
+			rd = strings.TrimSpace(rd)
+			rolls := strings.Split(rd, ", ")
+			for _, roll := range rolls {
+				r := strings.Split(roll, " ")
+				n, color := r[0], r[1]
+				num, _ := strconv.Atoi(n)
+				if num > int(colorMap[color]) {
+					gameValid = false
+					break
+				}
+			}
+		}
+		validGames = append(validGames, gameValid)
+	}
+	res := 0
+	for i, valid := range validGames {
+		if valid {
+			res += i + 1
+		}
+	}
+	return res
+}
+
+func year2023Day2Part2(data []string) int {
+	powers := make([]int, 0, len(data))
+	for _, game := range data {
+		minBlue, minGreen, minRed := 0, 0, 0
+		rounds := strings.Split(strings.Split(game, ":")[1], ";")
+		for _, rd := range rounds {
+			rd = strings.TrimSpace(rd)
+			rolls := strings.Split(rd, ", ")
+			for _, roll := range rolls {
+				r := strings.Split(roll, " ")
+				n, color := r[0], r[1]
+				num, _ := strconv.Atoi(n)
+				switch color {
+				case "red":
+					minRed = max(minRed, num)
+				case "green":
+					minGreen = max(minGreen, num)
+				case "blue":
+					minBlue = max(minBlue, num)
+				}
+			}
+		}
+		powers = append(powers, minRed*minBlue*minGreen)
+	}
+	res := 0
+	for _, power := range powers {
+		res += power
+	}
+	return res
+}

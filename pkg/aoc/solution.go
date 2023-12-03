@@ -17,6 +17,14 @@ func (s Solution[T]) Execute() (any, any) {
 	return res[0].Interface(), res[1].Interface()
 }
 
+func (s Solution[T]) dataFilename() string {
+	return fmt.Sprintf("data/year%dday%d.txt", s.year, s.day)
+}
+
+func (s Solution[T]) methodName() string {
+	return fmt.Sprintf("Year%dDay%d", s.year, s.day)
+}
+
 func ReadFile(filename string) []string {
 	var lines []string
 	readFile := Must(os.Open(filename))
@@ -27,14 +35,6 @@ func ReadFile(filename string) []string {
 		lines = append(lines, fileScanner.Text())
 	}
 	return lines
-}
-
-func (s Solution[T]) dataFilename() string {
-	return fmt.Sprintf("data/year%dday%d.txt", s.year, s.day)
-}
-
-func (s Solution[T]) methodName() string {
-	return fmt.Sprintf("Year%dDay%d", s.year, s.day)
 }
 
 func in[T comparable](val T, container []T) bool {
