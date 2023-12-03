@@ -2,7 +2,9 @@ package aoc
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 )
@@ -23,6 +25,29 @@ func (s Solution[T]) dataFilename() string {
 
 func (s Solution[T]) methodName() string {
 	return fmt.Sprintf("Year%dDay%d", s.year, s.day)
+}
+
+func (s Solution[T]) saveData() {
+	filename := fmt.Sprintf(Filename, s.year, s.day)
+
+	file, err := os.Open(filename)
+	if !errors.Is(err, os.ErrNotExist) {
+		file.Close()
+		return
+	}
+
+	err = Get(s.day, s.year, filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
+func (s Solution[T]) post(level, res int) {
+	err := Post(s.day, level, res)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func ReadFile(filename string) []string {

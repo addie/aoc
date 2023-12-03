@@ -1,4 +1,4 @@
-package aoc
+package cmd
 
 import (
 	"aoc/pkg/aoc"

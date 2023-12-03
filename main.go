@@ -1,9 +1,9 @@
 package main
 
 import (
-	"aoc/cmd/aoc"
+	"aoc/cmd"
 )
 
 func main() {
-	aoc.Execute()
+	cmd.Execute()
 }

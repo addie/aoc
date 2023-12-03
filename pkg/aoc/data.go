@@ -1,4 +1,4 @@
-package data
+package aoc
 
 import (
 	"errors"
@@ -10,11 +10,13 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/BurntSushi/toml"
 )
 
 const (
 	URL      = "https://adventofcode.com/%d/day/%d"
-	Filename = "data/day%d"
+	Filename = "data/year%dday%d.txt"
 )
 
 type Configuration struct {
@@ -41,9 +43,19 @@ func Post(day, level, result int) error {
 	return nil
 }
 
+type TOML struct {
+	SessionID string `toml:"SessionID"`
+	UserAgent string `toml:"UserAgent"`
+}
+
 func Get(day, year int, filename string) error {
+
+	// Load a TOML file
+	secrets := TOML{}
+	_ = Must(toml.DecodeFile("secret.toml", &secrets))
+
 	config := &Configuration{
-		SessionCookie: "",
+		SessionCookie: secrets.SessionID,
 		Output:        filename,
 		Year:          year,
 		Day:           day,
