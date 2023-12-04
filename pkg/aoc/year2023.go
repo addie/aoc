@@ -272,3 +272,10 @@ func year2023Day3Part2(data []string) int {
 	}
 	return res
 }
+
+func (s Solution[T]) Year2023Day4(_ string) (int, int) {
+	data := ReadFile("data/year2023day4.txt")
+	res1 := year2023Day3Part1(data)
+	res2 := year2023Day3Part2(data)
+	return res1, res2
+}

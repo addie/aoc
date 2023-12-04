@@ -69,7 +69,7 @@ func Get(day, year int, filename string) error {
 
 	resp, err := query(http.MethodGet, config)
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
 	defer resp.Body.Close()
 
