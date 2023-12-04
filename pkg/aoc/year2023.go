@@ -1,6 +1,7 @@
 package aoc
 
 import (
+	"math"
 	"strconv"
 	"strings"
 	"unicode"
@@ -275,7 +276,81 @@ func year2023Day3Part2(data []string) int {
 
 func (s Solution[T]) Year2023Day4(_ string) (int, int) {
 	data := ReadFile("data/year2023day4.txt")
-	res1 := year2023Day3Part1(data)
-	res2 := year2023Day3Part2(data)
+	res1 := year2023Day4Part1(data)
+	res2 := year2023Day4Part2(data)
 	return res1, res2
+}
+
+// Card 1: 41 48 83 86 17 | 83 86 6 31 17 9 48 53
+func year2023Day4Part1(data []string) int {
+	allPoints := 0
+	for _, card := range data {
+		mine := make(map[string]struct{})
+		d := strings.Split(strings.Split(card, ":")[1], "|")
+		card := strings.Fields(strings.TrimSpace(d[0]))
+		mineList := strings.Fields(strings.TrimSpace(d[1]))
+		for _, m := range mineList {
+			mine[m] = struct{}{}
+		}
+		pow := 0
+		for _, n := range card {
+			if _, ok := mine[n]; ok {
+				pow++
+			}
+		}
+		curr := math.Pow(2, float64(pow)-1)
+		allPoints += int(curr)
+	}
+	return allPoints
+}
+
+func year2023Day4Part2(data []string) int {
+	matchCount := make(map[int]int)
+	for i, card := range data {
+		mine := make(map[string]struct{})
+		d := strings.Split(strings.Split(card, ":")[1], "|")
+		card := strings.Fields(strings.TrimSpace(d[0]))
+		mineList := strings.Fields(strings.TrimSpace(d[1]))
+		for _, m := range mineList {
+			mine[m] = struct{}{}
+		}
+		calculateMatches(matchCount, i+1, card, mine)
+	}
+	m := summarize(matchCount, len(data))
+	res := 0
+	for _, v := range m {
+		res += v
+	}
+	return res + len(data)
+}
+
+func calculateMatches(matchCount map[int]int, cardNo int, card []string, mine map[string]struct{}) int {
+	matches := 0
+	for _, n := range card {
+		if _, ok := mine[n]; ok {
+			matches++
+		}
+	}
+	matchCount[cardNo] = matches
+	return matches
+}
+
+func summarize(matchCount map[int]int, cardCount int) map[int]int {
+	m := make(map[int]int)
+	for i := 1; i < cardCount; i++ {
+		addCards(m, matchCount, i)
+		for j := 0; j < m[i]; j++ {
+			addCards(m, matchCount, i)
+		}
+	}
+	return m
+}
+
+func addCards(m map[int]int, count map[int]int, cardNo int) {
+	numOfCards := count[cardNo]
+	for numOfCards > 0 {
+		cardNo++
+		m[cardNo]++
+		numOfCards--
+	}
 }
