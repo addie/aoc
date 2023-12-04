@@ -305,6 +305,35 @@ func year2023Day4Part1(data []string) int {
 }
 
 func year2023Day4Part2(data []string) int {
+	calculateMatches := func(matchCount map[int]int, cardNo int, card []string, mine map[string]struct{}) int {
+		matches := 0
+		for _, n := range card {
+			if _, ok := mine[n]; ok {
+				matches++
+			}
+		}
+		matchCount[cardNo] = matches
+		return matches
+	}
+	addCards := func(m map[int]int, count map[int]int, cardNo int) {
+		numOfCards := count[cardNo]
+		for numOfCards > 0 {
+			cardNo++
+			m[cardNo]++
+			numOfCards--
+		}
+	}
+	summarize := func(matchCount map[int]int, cardCount int) map[int]int {
+		m := make(map[int]int)
+		for i := 1; i < cardCount; i++ {
+			addCards(m, matchCount, i)
+			for j := 0; j < m[i]; j++ {
+				addCards(m, matchCount, i)
+			}
+		}
+		return m
+	}
+
 	matchCount := make(map[int]int)
 	for i, card := range data {
 		mine := make(map[string]struct{})
@@ -324,33 +353,17 @@ func year2023Day4Part2(data []string) int {
 	return res + len(data)
 }
 
-func calculateMatches(matchCount map[int]int, cardNo int, card []string, mine map[string]struct{}) int {
-	matches := 0
-	for _, n := range card {
-		if _, ok := mine[n]; ok {
-			matches++
-		}
-	}
-	matchCount[cardNo] = matches
-	return matches
+func (s Solution[T]) Year2023Day5(path string) (int, int) {
+	data := ReadFile(path)
+	res1 := year2023Day5Part1(data)
+	res2 := year2023Day5Part2(data)
+	return res1, res2
 }
 
-func summarize(matchCount map[int]int, cardCount int) map[int]int {
-	m := make(map[int]int)
-	for i := 1; i < cardCount; i++ {
-		addCards(m, matchCount, i)
-		for j := 0; j < m[i]; j++ {
-			addCards(m, matchCount, i)
-		}
-	}
-	return m
+func year2023Day5Part1(data []string) int {
+	return 0
 }
 
-func addCards(m map[int]int, count map[int]int, cardNo int) {
-	numOfCards := count[cardNo]
-	for numOfCards > 0 {
-		cardNo++
-		m[cardNo]++
-		numOfCards--
-	}
+func year2023Day5Part2(data []string) int {
+	return 0
 }
