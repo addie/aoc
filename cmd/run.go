@@ -8,7 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Demo bool
+
 func init() {
+	runCmd.Flags().BoolVarP(&Demo, "demo", "d", true, "Use demo input")
 	rootCmd.AddCommand(runCmd)
 }
 
@@ -17,7 +20,7 @@ var runCmd = &cobra.Command{
 	Short: "Runs the provided aoc algorithm",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		res1, res2 := aoc.Run(args[0], args[1])
+		res1, res2 := aoc.Run(args[0], args[1], Demo)
 		printResult(res1)
 		printResult(res2)
 	},

@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func Run(y, d string) (any, any) {
+func Run(y, d string, demo bool) (any, any) {
 	year := Must(strconv.Atoi(y))
 	day := Must(strconv.Atoi(d))
 	s := Solution[int]{
@@ -13,7 +13,7 @@ func Run(y, d string) (any, any) {
 		day:  day,
 	}
 	s.saveData()
-	return s.Execute()
+	return s.Execute(demo)
 }
 
 func Must[T any](i T, err error) T {

@@ -13,13 +13,17 @@ type Solution[T any] struct {
 	year, day int
 }
 
-func (s Solution[T]) Execute() (any, any) {
-	inputs := []reflect.Value{reflect.ValueOf(s.dataFilename())}
+func (s Solution[T]) Execute(demo bool) (any, any) {
+	input := s.dataFilename(demo)
+	inputs := []reflect.Value{reflect.ValueOf(input)}
 	res := reflect.ValueOf(s).MethodByName(s.methodName()).Call(inputs)
 	return res[0].Interface(), res[1].Interface()
 }
 
-func (s Solution[T]) dataFilename() string {
+func (s Solution[T]) dataFilename(demo bool) string {
+	if demo {
+		return fmt.Sprintf("data/year%dday%ddemo.txt", s.year, s.day)
+	}
 	return fmt.Sprintf("data/year%dday%d.txt", s.year, s.day)
 }
 

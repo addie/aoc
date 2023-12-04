@@ -7,8 +7,8 @@ import (
 	"unicode"
 )
 
-func (s Solution[T]) Year2023Day1(_ string) (int, int) {
-	data := ReadFile("data/year2023day1.txt")
+func (s Solution[T]) Year2023Day1(path string) (int, int) {
+	data := ReadFile(path)
 	res1 := year2023Day1Part1(data)
 	res2 := year2023Day1Part2(data)
 	return res1, res2
@@ -68,8 +68,8 @@ func findDigits(numMap map[string]int, line string) []int {
 	return digits
 }
 
-func (s Solution[T]) Year2023Day2(_ string) (int, int) {
-	data := ReadFile("data/year2023day2.txt")
+func (s Solution[T]) Year2023Day2(path string) (int, int) {
+	data := ReadFile(path)
 	res1 := year2023Day2Part1(data)
 	res2 := year2023Day2Part2(data)
 	return res1, res2
@@ -147,8 +147,8 @@ func year2023Day2Part2(data []string) int {
 	return res
 }
 
-func (s Solution[T]) Year2023Day3(_ string) (int, int) {
-	data := ReadFile("data/year2023day3.txt")
+func (s Solution[T]) Year2023Day3(path string) (int, int) {
+	data := ReadFile(path)
 	res1 := year2023Day3Part1(data)
 	res2 := year2023Day3Part2(data)
 	return res1, res2
@@ -274,8 +274,8 @@ func year2023Day3Part2(data []string) int {
 	return res
 }
 
-func (s Solution[T]) Year2023Day4(_ string) (int, int) {
-	data := ReadFile("data/year2023day4.txt")
+func (s Solution[T]) Year2023Day4(path string) (int, int) {
+	data := ReadFile(path)
 	res1 := year2023Day4Part1(data)
 	res2 := year2023Day4Part2(data)
 	return res1, res2
