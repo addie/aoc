@@ -636,6 +636,7 @@ func (s Solution[T]) Year2022Day11() (int, int) {
 		opp                                     string
 		val, test, ifTrue, ifFalse, inspections int
 	}
+
 	// demo data
 	demoMonkeys := []monkeyType{
 		{items: []int{79, 98}, opp: "*", val: 19, test: 23, ifTrue: 2, ifFalse: 3},

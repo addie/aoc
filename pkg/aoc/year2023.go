@@ -156,6 +156,14 @@ func (s Solution[T]) Year2023Day3(_ string) (int, int) {
 func isDigit(s string) bool { return strings.ContainsAny(s, "0123456789") }
 
 func year2023Day3Part1(data []string) int {
+	grid := make([][]string, len(data))
+	for i := range data {
+		grid[i] = strings.Split(data[i], "")
+	}
+	var partNumbers []int
+	isPrevDigit := false
+	isPartNo := false
+	currDigit := ""
 	checkPartNumber := func(grid [][]string, r, c int) bool {
 		directions := []coord{{r: 0, c: 1}, {r: 1, c: 0}, {r: 1, c: 1}, {r: -1, c: 0}, {r: 0, c: -1}, {r: -1, c: -1}, {r: -1, c: 1}, {r: 1, c: -1}}
 		for _, dir := range directions {
@@ -175,14 +183,6 @@ func year2023Day3Part1(data []string) int {
 		}
 		return false
 	}
-	grid := make([][]string, len(data))
-	for i := range data {
-		grid[i] = strings.Split(data[i], "")
-	}
-	var partNumbers []int
-	isPrevDigit := false
-	isPartNo := false
-	currDigit := ""
 	for r := range grid {
 		for c := range grid[r] {
 			cell := grid[r][c]
@@ -237,7 +237,9 @@ func year2023Day3Part2(data []string) int {
 	R, C := len(grid), len(grid[0])
 	nums := make(map[coord][]int)
 	for r := range grid {
-		gears := make(map[coord]struct{}) // positions of '*'
+		// set containing positions of '*' (gears)
+		// collect all the gears surrounding each number group
+		gears := make(map[coord]struct{})
 		n := 0
 		for c := range grid[0] {
 			if c < C && isDigit(grid[r][c]) {
@@ -253,7 +255,7 @@ func year2023Day3Part2(data []string) int {
 						}
 					}
 				}
-			} else if n > 0 {
+			} else if n > 0 { // every time you pass a number, add the gears to the map
 				for gear := range gears {
 					nums[gear] = append(nums[gear], n)
 				}
