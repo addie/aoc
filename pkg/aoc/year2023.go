@@ -1,7 +1,9 @@
 package aoc
 
 import (
+	"cmp"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -200,7 +202,7 @@ func year2023Day3Part1(data []string) int {
 					isPartNo = true
 				}
 				if isPartNo {
-					partNumbers = append(partNumbers, Must(strconv.Atoi(currDigit)))
+					partNumbers = append(partNumbers, toInt(currDigit))
 					currDigit = ""
 					continue
 				}
@@ -354,16 +356,136 @@ func year2023Day4Part2(data []string) int {
 }
 
 func (s Solution[T]) Year2023Day5(path string) (int, int) {
-	data := ReadFile(path)
+	data := ReadFileToString(path)
 	res1 := year2023Day5Part1(data)
 	res2 := year2023Day5Part2(data)
 	return res1, res2
 }
 
-func year2023Day5Part1(data []string) int {
-	return 0
+/*********************/
+/* Helpers for Day 5 */
+/*********************/
+
+func minLists[T cmp.Ordered](lists [][]T, key ...func(t []T) T) []T {
+	k := func(t []T) T {
+		return t[0]
+	}
+	if key != nil {
+		k = key[0]
+	}
+	minList := lists[0]
+	for i := 1; i < len(lists); i++ {
+		if k(lists[i]) < k(minList) {
+			minList = lists[i]
+		}
+	}
+	return minList
 }
 
-func year2023Day5Part2(data []string) int {
-	return 0
+type fs struct {
+	tuples [][]int
+}
+
+// fs constructor
+func newFS(s string) fs {
+	f := fs{}
+	lines := strings.Split(s, "\n")[1:]
+	for _, line := range lines {
+		var grouping []int
+		for _, x := range strings.Fields(line) {
+			grouping = append(grouping, toInt(x))
+		}
+		f.tuples = append(f.tuples, grouping)
+	}
+	return f
+}
+
+func (f fs) applyOne(x int) int {
+	for _, tuple := range f.tuples {
+		dst, src, sz := tuple[0], tuple[1], tuple[2]
+		if src <= x && x < src+sz {
+			return x + dst - src
+		}
+	}
+	return x
+}
+func (f fs) applyRange(R [][]int) [][]int {
+	var A [][]int
+	for _, t := range f.tuples {
+		dest, src, sz := t[0], t[1], t[2]
+		srcEnd := src + sz
+		var NR [][]int
+		for len(R) > 0 {
+			// [start                                     end)
+			//          [src       srcEnd]
+			// [BEFORE ][MIDDLE          ][AFTER             )
+			a := R[len(R)-1]
+			R = R[:len(R)-1]
+			start, end := a[0], a[1]
+			// (src,sz) might cut (start,end)
+			before := []int{start, min(end, src)}
+			middle := []int{max(start, src), min(srcEnd, end)}
+			after := []int{max(srcEnd, start), end}
+			if before[1] > before[0] {
+				NR = append(NR, before)
+			}
+			if middle[1] > middle[0] {
+				A = append(A, []int{middle[0] - src + dest, middle[1] - src + dest})
+			}
+			if after[1] > after[0] {
+				NR = append(NR, after)
+			}
+		}
+		R = NR
+	}
+	return append(A, R...)
+}
+
+func year2023Day5Part1(data string) int {
+	parts := strings.Split(data, "\n\n")
+	seedStr, others := parts[0], parts[1:]
+	var seed []int
+	for _, x := range strings.Fields(strings.Split(seedStr, ":")[1]) {
+		seed = append(seed, toInt(x))
+	}
+	var ff []fs
+	for _, other := range others {
+		ff = append(ff, newFS(strings.TrimSpace(other)))
+	}
+	var resList []int
+	for _, x := range seed {
+		for _, f := range ff {
+			x = f.applyOne(x)
+		}
+		resList = append(resList, x)
+	}
+	return slices.Min(resList)
+}
+
+func year2023Day5Part2(data string) int {
+	parts := strings.Split(data, "\n\n")
+	seedStr, others := parts[0], parts[1:]
+	var seed []int
+	for _, x := range strings.Fields(strings.Split(seedStr, ":")[1]) {
+		seed = append(seed, toInt(x))
+	}
+	var ff []fs
+	for _, other := range others {
+		ff = append(ff, newFS(strings.TrimSpace(other)))
+	}
+	pairs := zip(alt(seed), alt(seed[1:]))
+	var resList []int
+	for _, t := range pairs {
+		st, sz := t[0], t[1]
+		// inclusive on the left, exclusive on the right
+		// e.g. [1,3) = [1,2]
+		// length of [a,b) = b-a
+		// [a,b) + [b,c) = [a,c)
+		R := [][]int{{st, st + sz}}
+		for _, f := range ff {
+			R = f.applyRange(R)
+		}
+		resList = append(resList, minLists(R)[0])
+	}
+	return slices.Min(resList)
 }

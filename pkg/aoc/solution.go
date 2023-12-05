@@ -65,6 +65,9 @@ func ReadFile(filename string) []string {
 	}
 	return lines
 }
+func ReadFileToString(filename string) string {
+	return string(Must(os.ReadFile(filename)))
+}
 
 func in[T comparable](val T, container []T) bool {
 	for _, v := range container {
