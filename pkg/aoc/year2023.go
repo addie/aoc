@@ -489,3 +489,49 @@ func year2023Day5Part2(data string) int {
 	}
 	return slices.Min(resList)
 }
+
+func (s Solution[T]) Year2023Day6(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day6Part1(data)
+	res2 := year2023Day6Part2(data)
+	return res1, res2
+}
+
+func year2023Day6Part1(data string) int {
+	lines := strings.Split(data, "\n")
+	times := strings.Fields(strings.Split(lines[0], ":")[1])
+	dists := strings.Fields(strings.Split(lines[1], ":")[1])
+	res := 1
+	for i, t := range times {
+		time := toInt(t)
+		c := 0
+		for vel := 1; vel < time; vel++ {
+			dist := vel * (time - vel)
+			if dist > toInt(dists[i]) {
+				c++
+			}
+		}
+		if c > 0 {
+			res *= c
+		}
+	}
+	return res
+}
+
+func year2023Day6Part2(data string) int {
+	lines := strings.Split(data, "\n")
+	time := toInt(strings.Join(strings.Fields(strings.Split(lines[0], ":")[1]), ""))
+	record := toInt(strings.Join(strings.Fields(strings.Split(lines[1], ":")[1]), ""))
+	res := 1
+	c := 0
+	for vel := 1; vel < time; vel++ {
+		dist := vel * (time - vel)
+		if dist > record {
+			c++
+		}
+	}
+	if c > 0 {
+		res *= c
+	}
+	return res
+}
