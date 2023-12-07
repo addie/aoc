@@ -84,6 +84,14 @@ func toInt(s string) int {
 	return Must(strconv.Atoi(s))
 }
 
+type Number interface {
+	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64
+}
+
+func toStr[T Number](i T) string {
+	return strconv.Itoa(int(i))
+}
+
 // zip groups elements in two slices by index number
 // into a list of tuples so s1 = [1, 2, 3] and
 // s2 = [4, 5, 6] returns [(1, 4), (2, 5), (3, 6)]

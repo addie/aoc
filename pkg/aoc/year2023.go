@@ -2,11 +2,14 @@ package aoc
 
 import (
 	"cmp"
+	"maps"
 	"math"
 	"slices"
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/mowshon/iterium"
 )
 
 func (s Solution[T]) Year2023Day1(path string) (int, int) {
@@ -490,6 +493,10 @@ func year2023Day5Part2(data string) int {
 	return slices.Min(resList)
 }
 
+// Year2023Day6 using a Simple linear search solution.
+// One optimization we can do is use binary search to find the two points
+// where the travel time breaks the record and then assume all times in between
+// should be counted
 func (s Solution[T]) Year2023Day6(path string) (int, int) {
 	data := ReadFileToString(path)
 	res1 := year2023Day6Part1(data)
@@ -532,6 +539,189 @@ func year2023Day6Part2(data string) int {
 	}
 	if c > 0 {
 		res *= c
+	}
+	return res
+}
+
+func (s Solution[T]) Year2023Day7(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day7Part1(data)
+	res2 := year2023Day7Part2(data)
+	return res1, res2
+}
+
+// Hands
+// A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2
+// 7 Five of a kind, where all five cards have the same label: AAAAA
+// 6 Four of a kind, where four cards have the same label and one card has a different label: AA8AA
+// 5 Full house, where three cards have the same label, and the remaining two cards share a different label: 23332
+// 4 Three of a kind, where three cards have the same label, and the remaining two cards are each different from any other card in the hand: TTT98
+// 3 Two pair, where two cards share one label, two other cards share a second label, and the remaining card has a third label: 23432
+// 2 One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
+// 1 High card, where all cards' labels are distinct: 23456
+func year2023Day7Part1(data string) int {
+	type hb struct {
+		hand string
+		bid  int
+	}
+	var hands []hb
+	handsBids := strings.Split(data, "\n")
+	for _, handsBid := range handsBids {
+		if handsBid != "" {
+			f := strings.Fields(handsBid)
+			hands = append(hands, hb{hand: f[0], bid: toInt(f[1])})
+		}
+	}
+	getPoints := func(a hb) int {
+		tc := make(map[int32]int)
+		for _, c := range a.hand {
+			tc[c]++
+		}
+		c := make([]int, 5)
+		for _, v := range tc {
+			c[5-v]++
+		}
+		if c[0] > 0 {
+			return 7
+		} // five of a kind
+		if c[1] > 0 {
+			return 6
+		} // four of a kind
+		if c[2] > 0 && c[3] > 0 {
+			return 5
+		} // full house
+		if c[2] > 0 {
+			return 4
+		} // three of a kind
+		if c[1] > 1 {
+			return 3
+		} // two pair
+		if c[1] > 0 {
+			return 2
+		} // one pair
+		return 1
+	}
+	slices.SortFunc(hands, func(a, b hb) int {
+		cardRanks := map[string]int{
+			"A": 14, "K": 13, "Q": 12, "J": 11, "T": 10, "9": 9,
+			"8": 8, "7": 7, "6": 6, "5": 5, "4": 4, "3": 3, "2": 2,
+		}
+		//
+		pointsA := getPoints(a)
+		pointsB := getPoints(b)
+		if pointsA < pointsB {
+			return -1
+		}
+		if pointsA > pointsB {
+			return 1
+		}
+		for i := 0; i < 5; i++ {
+			if cardRanks[string(a.hand[i])] < cardRanks[string(b.hand[i])] {
+				return -1
+			}
+			if cardRanks[string(a.hand[i])] > cardRanks[string(b.hand[i])] {
+				return 1
+			}
+		}
+		return 0
+	})
+	res := 0
+	for i, h := range hands {
+		rank := i + 1
+		res += h.bid * rank
+	}
+	return res
+}
+
+func year2023Day7Part2(data string) int {
+	type hb struct {
+		hand string
+		bid  int
+	}
+	var hands []hb
+	handsBids := strings.Split(data, "\n")
+	for _, handsBid := range handsBids {
+		if handsBid != "" {
+			f := strings.Fields(handsBid)
+			hands = append(hands, hb{hand: f[0], bid: toInt(f[1])})
+		}
+	}
+	getPoints := func(tc map[int32]int) int {
+		c := make([]int, 5)
+		for _, v := range tc {
+			c[5-v]++
+		}
+		if c[0] > 0 {
+			return 7
+		} // five of a kind
+		if c[1] > 0 {
+			return 6
+		} // four of a kind
+		if c[2] > 0 && c[3] > 0 {
+			return 5
+		} // full house
+		if c[2] > 0 {
+			return 4
+		} // three of a kind
+		if c[1] > 1 {
+			return 3
+		} // two pair
+		if c[1] > 0 {
+			return 2
+		} // one pair
+		return 1
+	}
+	getRank := func(a hb) int {
+		tc := make(map[int32]int)
+		for _, c := range a.hand {
+			tc[c]++
+		}
+		jc := tc['J']
+		delete(tc, 'J')
+		if jc == 0 {
+			return getPoints(tc)
+		}
+		combinations := iterium.CombinationsWithReplacement([]int32{'A', 'K', 'Q', 'T', '9', '8',
+			'7', '6', '5', '4', '3', '2'}, jc)
+		rank := 0
+		for _, c := range Must(combinations.Slice()) {
+			newTC := make(map[int32]int)
+			maps.Copy(newTC, tc)
+			for i := 0; i < jc; i++ {
+				newTC[c[i]]++
+			}
+			r := getPoints(newTC)
+			rank = max(rank, r)
+		}
+		return rank
+	}
+	slices.SortFunc(hands, func(a, b hb) int {
+		rankA := getRank(a)
+		rankB := getRank(b)
+		if rankA < rankB {
+			return -1
+		}
+		if rankA > rankB {
+			return 1
+		}
+		cardRanks := map[string]int{
+			"A": 14, "K": 13, "Q": 12, "T": 11, "9": 10, "8": 9,
+			"7": 8, "6": 7, "5": 6, "4": 5, "3": 4, "2": 3, "J": 2,
+		}
+		for i := 0; i < 5; i++ {
+			if cardRanks[string(a.hand[i])] < cardRanks[string(b.hand[i])] {
+				return -1
+			}
+			if cardRanks[string(a.hand[i])] > cardRanks[string(b.hand[i])] {
+				return 1
+			}
+		}
+		return 0
+	})
+	res := 0
+	for i, h := range hands {
+		rank := i + 1
+		res += h.bid * rank
 	}
 	return res
 }
