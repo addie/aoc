@@ -1,6 +1,7 @@
 package aoc
 
 import (
+	"aoc/pkg/aoc"
 	"bufio"
 	"log"
 	"os"
@@ -29,7 +30,7 @@ func Day6Part2() int {
 func lanternFishCount(days int, input []int) int {
 	const resetFish = 6
 	const newFish = 8
-	counter := counter(input)
+	counter := aoc.Counter(input)
 	for day := 0; day < days; day++ {
 		fishMap := make(map[int]int) // tracks how many fish have n numbers to give birth
 		for numDays, count := range counter {
@@ -51,18 +52,6 @@ func sum(counter map[int]int) int {
 		count += val
 	}
 	return count
-}
-
-func counter(input []int) map[int]int {
-	c := make(map[int]int)
-	for _, in := range input {
-		if _, ok := c[in]; ok {
-			c[in]++
-		} else {
-			c[in] = 1
-		}
-	}
-	return c
 }
 
 func get6() ([]int, error) {

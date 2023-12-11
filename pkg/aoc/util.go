@@ -1,10 +1,26 @@
 package aoc
 
 import (
+	"fmt"
 	"strconv"
 )
 
 type coord struct{ r, c int }
+
+var (
+	Up    = coord{r: -1}
+	Down  = coord{1, 0}
+	Left  = coord{0, -1}
+	Right = coord{0, 1}
+)
+
+func Counter(input []int) map[int]int {
+	c := make(map[int]int)
+	for _, in := range input {
+		c[in]++
+	}
+	return c
+}
 
 type TrieNode struct {
 	Children map[rune]*TrieNode
@@ -84,11 +100,17 @@ func toInt(s string) int {
 	return Must(strconv.Atoi(s))
 }
 
-type Number interface {
-	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64
+type Integer interface {
+	SignedInteger | UnsignedInteger
+}
+type SignedInteger interface {
+	int | int8 | int16 | int32 | int64
+}
+type UnsignedInteger interface {
+	uint | uint8 | uint16 | uint32 | uint64
 }
 
-func toStr[T Number](i T) string {
+func toStr[T Integer](i T) string {
 	return strconv.Itoa(int(i))
 }
 
@@ -113,4 +135,52 @@ func alt[T any](orig []T) []T {
 		}
 	}
 	return evenVals
+}
+
+func mapKeys[K comparable, V any](m map[K]V) []K {
+	var s []K
+	for k := range m {
+		s = append(s, k)
+	}
+	return s
+}
+
+func in[T comparable](val T, container []T) bool {
+	for _, v := range container {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
+
+func pop[T any](alist []T) T {
+	f := len(alist)
+	rv := (alist)[f-1]
+	alist = (alist)[:f-1]
+	return rv
+}
+
+func popleft[T any](alist *[]T) T {
+	lv := (*alist)[0]
+	*alist = (*alist)[1:]
+	return lv
+}
+
+func printStringGrid[T Integer](grid [][]T) {
+	for r := range grid {
+		for c := range grid[r] {
+			fmt.Printf("%s ", string(grid[r][c]))
+		}
+		fmt.Println()
+	}
+}
+
+func printIntGrid[T Integer](grid [][]T) {
+	for r := range grid {
+		for c := range grid[r] {
+			fmt.Printf("%d ", grid[r][c])
+		}
+		fmt.Println()
+	}
 }

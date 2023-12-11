@@ -2,8 +2,10 @@ package aoc
 
 import (
 	"cmp"
+	"fmt"
 	"maps"
 	"math"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -724,4 +726,459 @@ func year2023Day7Part2(data string) int {
 		res += h.bid * rank
 	}
 	return res
+}
+
+func (s Solution[T]) Year2023Day8(path string) (int, int) {
+	newPath := path
+	if strings.Contains(path, "demo") {
+		s := strings.Split(path, ".")
+		s[0] += "P1"
+		newPath = strings.Join(s, ".")
+	}
+	data := ReadFileToString(newPath)
+	res1 := year2023Day8Part1(data)
+	newPath = path
+	if strings.Contains(path, "demo") {
+		s := strings.Split(path, ".")
+		s[0] += "P2"
+		newPath = strings.Join(s, ".")
+	}
+	data = ReadFileToString(newPath)
+	res2 := year2023Day8Part2(data)
+	return res1, res2
+}
+
+func year2023Day8Part1(data string) int {
+	a := strings.Split(data, "\n\n")
+	inst, allSteps := strings.TrimSpace(a[0]), strings.TrimSpace(a[1])
+	instrs := strings.Split(inst, "")
+	steps := strings.Split(allSteps, "\n")
+	m := make(map[string][]string)
+	for _, step := range steps {
+		b := strings.Split(step, " = ")
+		var vals []string
+		vals = append(vals, strings.Split(b[1][1:len(b[1])-1], ", ")...)
+		m[strings.TrimSpace(b[0])] = vals
+	}
+	count := 0
+	next := "AAA"
+	for next != "ZZZ" {
+		nextOpts := m[next]
+		next = nextOpts[0]
+		if instrs[count%len(instrs)] == "R" {
+			next = nextOpts[1]
+		}
+		count++
+	}
+	return count
+}
+
+func year2023Day8Part2(data string) int {
+	a := strings.Split(data, "\n\n")
+	inst, allSteps := strings.TrimSpace(a[0]), strings.TrimSpace(a[1])
+	instrs := strings.Split(inst, "")
+	steps := strings.Split(allSteps, "\n")
+	m := make(map[string][]string)
+	for _, step := range steps {
+		b := strings.Split(step, " = ")
+		var vals []string
+		vals = append(vals, strings.Split(b[1][1:len(b[1])-1], ", ")...)
+		m[strings.TrimSpace(b[0])] = vals
+	}
+	allEndIn := func(nexts []string, pat string) []string {
+		var noAtoY []string
+		for _, next := range nexts {
+			if Must(regexp.Match(pat, []byte{next[len(next)-1]})) {
+				noAtoY = append(noAtoY, next)
+			}
+		}
+		return noAtoY
+	}
+	count := 0
+	nextList := allEndIn(mapKeys(m), "A")
+	sz := len(nextList)
+	for {
+		var newList []string
+		for _, next := range nextList {
+			nextOpts := m[next]
+			next = nextOpts[0]
+			if instrs[count%len(instrs)] == "R" {
+				next = nextOpts[1]
+			}
+			newList = append(newList, next)
+		}
+		nextList = newList
+		count++
+		fmt.Println(count, nextList)
+		if len(allEndIn(newList, "Z")) == sz {
+			break
+		}
+	}
+	return count
+}
+
+func (s Solution[T]) Year2023Day9(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day9Part1(data)
+	res2 := year2023Day9Part2(data)
+	return res1, res2
+}
+
+func year2023Day9Part1(data string) int {
+	return 0
+}
+
+func year2023Day9Part2(data string) int {
+	return 0
+}
+
+func (s Solution[T]) Year2023Day10(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day10Part1(data)
+	res2 := year2023Day10Part2(data)
+	return res1, res2
+}
+
+func year2023Day10Part1(data string) int {
+	lines := strings.Fields(data)
+	grid := make([][]rune, len(lines))
+	for r := range lines {
+		grid[r] = make([]rune, len(lines[r]))
+		for c := range lines[r] {
+			grid[r][c] = rune(lines[r][c])
+		}
+	}
+	s := day10FindStart(grid)
+	dists := day10BFS(grid, *s)
+	m := dists[0][0]
+	for r := range dists {
+		for c := range dists[r] {
+			m = max(m, dists[r][c])
+		}
+	}
+	return m
+}
+
+func year2023Day10Part2(data string) int {
+	return 0
+}
+
+func day10BFS(grid [][]rune, s coord) [][]int {
+	type el struct {
+		coord coord
+		dist  int
+	}
+	queue := []el{{coord: s, dist: 0}}
+	moves := []coord{Up, Down, Left, Right}
+	dists := make([][]int, len(grid))
+	for r := range grid {
+		dists[r] = make([]int, len(grid[0]))
+		for c := range grid[r] {
+			dists[r][c] = -1
+		}
+	}
+	for len(queue) > 0 {
+		curr := queue[0]
+		queue = queue[1:]
+		if dists[curr.coord.r][curr.coord.c] >= 0 {
+			continue
+		}
+		dists[curr.coord.r][curr.coord.c] = curr.dist
+		for _, move := range moves {
+			nextR := curr.coord.r + move.r
+			nextC := curr.coord.c + move.c
+			next := coord{nextR, nextC}
+			if day10InBounds(grid, next) && day10MovePermitted(grid, move, next) {
+				queue = append(queue, el{coord{next.r, next.c}, curr.dist + 1})
+			}
+		}
+	}
+	return dists
+}
+
+func day10MovePermitted(grid [][]rune, move coord, next coord) bool {
+	cell := grid[next.r][next.c]
+	if move == Up && (cell == '|' || cell == 'F' || cell == '7') {
+		return true
+	}
+	if move == Down && (cell == '|' || cell == 'J' || cell == 'L') {
+		return true
+	}
+	if move == Left && (cell == '-' || cell == 'F' || cell == 'L') {
+		return true
+	}
+	if move == Right && (cell == '-' || cell == 'J' || cell == '7') {
+		return true
+	}
+	return false
+}
+
+func day10InBounds(grid [][]rune, n coord) bool {
+	return n.r >= 0 && n.r < len(grid) && n.c >= 0 && n.c < len(grid[0])
+}
+
+func day10FindStart(grid [][]rune) *coord {
+	for r := range grid {
+		for c := range grid[r] {
+			if string(grid[r][c]) == "S" {
+				return &coord{r: r, c: c}
+			}
+		}
+	}
+	return nil
+}
+
+func (s Solution[T]) Year2023Day11(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day11Part1(data)
+	res2 := year2023Day11Part2(data)
+	return res1, res2
+}
+
+func year2023Day11Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day11Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day12(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day12Part1(data)
+	res2 := year2023Day12Part2(data)
+	return res1, res2
+}
+
+func year2023Day12Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day12Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day13(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day13Part1(data)
+	res2 := year2023Day13Part2(data)
+	return res1, res2
+}
+
+func year2023Day13Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day13Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day14(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day14Part1(data)
+	res2 := year2023Day14Part2(data)
+	return res1, res2
+}
+
+func year2023Day14Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day14Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day15(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day15Part1(data)
+	res2 := year2023Day15Part2(data)
+	return res1, res2
+}
+
+func year2023Day15Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day15Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day16(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day16Part1(data)
+	res2 := year2023Day16Part2(data)
+	return res1, res2
+}
+
+func year2023Day16Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day16Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day17(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day17Part1(data)
+	res2 := year2023Day17Part2(data)
+	return res1, res2
+}
+
+func year2023Day17Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day17Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day18(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day18Part1(data)
+	res2 := year2023Day18Part2(data)
+	return res1, res2
+}
+
+func year2023Day18Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day18Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day19(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day19Part1(data)
+	res2 := year2023Day19Part2(data)
+	return res1, res2
+}
+
+func year2023Day19Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day19Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day20(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day20Part1(data)
+	res2 := year2023Day20Part2(data)
+	return res1, res2
+}
+
+func year2023Day20Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day20Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day21(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day21Part1(data)
+	res2 := year2023Day21Part2(data)
+	return res1, res2
+}
+
+func year2023Day21Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day21Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day22(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day22Part1(data)
+	res2 := year2023Day22Part2(data)
+	return res1, res2
+}
+
+func year2023Day22Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day22Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day23(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day23Part1(data)
+	res2 := year2023Day23Part2(data)
+	return res1, res2
+}
+
+func year2023Day23Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day23Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day24(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day24Part1(data)
+	res2 := year2023Day24Part2(data)
+	return res1, res2
+}
+
+func year2023Day24Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day24Part2(data string) int {
+
+	return 0
+}
+
+func (s Solution[T]) Year2023Day25(path string) (int, int) {
+	data := ReadFileToString(path)
+	res1 := year2023Day25Part1(data)
+	res2 := year2023Day25Part2(data)
+	return res1, res2
+}
+
+func year2023Day25Part1(data string) int {
+
+	return 0
+}
+
+func year2023Day25Part2(data string) int {
+
+	return 0
 }

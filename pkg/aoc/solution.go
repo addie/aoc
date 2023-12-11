@@ -68,31 +68,3 @@ func ReadFile(filename string) []string {
 func ReadFileToString(filename string) string {
 	return string(Must(os.ReadFile(filename)))
 }
-
-func in[T comparable](val T, container []T) bool {
-	for _, v := range container {
-		if v == val {
-			return true
-		}
-	}
-	return false
-}
-
-func pop[T any](alist *[]T) T {
-	f := len(*alist)
-	rv := (*alist)[f-1]
-	*alist = (*alist)[:f-1]
-	return rv
-}
-
-func popleft[T any](alist *[]T) T {
-	lv := (*alist)[0]
-	*alist = (*alist)[1:]
-	return lv
-}
-
-func printGrid[T any](grid [][]T) {
-	for _, row := range grid {
-		fmt.Println(row)
-	}
-}
