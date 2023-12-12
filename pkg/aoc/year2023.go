@@ -1071,19 +1071,19 @@ func year2023Day11Part2(data string) int {
 }
 
 func (s Solution[T]) Year2023Day12(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day12Part1(data)
-	res2 := year2023Day12Part2(data)
+	grid := ReadFileToGrid(path)
+	res1 := year2023Day12Part1(grid)
+	res2 := year2023Day12Part2(grid)
 	return res1, res2
 }
 
-func year2023Day12Part1(data string) int {
-
+func year2023Day12Part1(grid [][]byte) int {
+	fmt.Println(grid)
 	return 0
 }
 
-func year2023Day12Part2(data string) int {
-
+func year2023Day12Part2(grid [][]byte) int {
+	fmt.Println(grid)
 	return 0
 }
 

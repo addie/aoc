@@ -35,7 +35,7 @@ func (s Solution[T]) saveData() {
 	filename := fmt.Sprintf(Filename, s.year, s.day)
 
 	file, err := os.Open(filename)
-	if !errors.Is(err, os.ErrNotExist) {
+	if errors.Is(err, os.ErrExist) {
 		file.Close()
 		return
 	}
@@ -65,6 +65,28 @@ func ReadFile(filename string) []string {
 	}
 	return lines
 }
+
 func ReadFileToString(filename string) string {
 	return string(Must(os.ReadFile(filename)))
+}
+
+func ReadFileToGrid(filename string) [][]byte {
+	var lines []string
+	readFile := Must(os.Open(filename))
+	defer readFile.Close()
+	fileScanner := bufio.NewScanner(readFile)
+	fileScanner.Split(bufio.ScanLines)
+	for fileScanner.Scan() {
+		lines = append(lines, fileScanner.Text())
+	}
+	grid := make([][]byte, len(lines))
+	for r := range grid {
+		grid[r] = make([]byte, len(grid[0]))
+	}
+	for r := range lines {
+		for c := range lines[r] {
+			grid[r][c] = lines[r][c]
+		}
+	}
+	return grid
 }
