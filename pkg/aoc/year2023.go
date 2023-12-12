@@ -936,13 +936,138 @@ func (s Solution[T]) Year2023Day11(path string) (int, int) {
 }
 
 func year2023Day11Part1(data string) int {
+	lines := strings.Fields(data)
+	// build grid
+	grid := make([][]byte, len(lines))
+	for r := range lines {
+		grid[r] = make([]byte, len(lines[r]))
+		for c := range lines[r] {
+			grid[r][c] = lines[r][c]
+		}
+	}
+	// collect empty rows
+	var emptyRows []int
+	for r := range grid {
+		empty := true
+		for c := range grid[r] {
+			if grid[r][c] == '#' {
+				empty = false
+			}
+		}
+		if empty {
+			emptyRows = append(emptyRows, r)
+		}
+	}
+	// collect empty columns
+	var emptyCols []int
+	for c := range grid {
+		empty := true
+		for r := range grid[c] {
+			if grid[r][c] == '#' {
+				empty = false
+			}
+		}
+		if empty {
+			emptyCols = append(emptyCols, c)
+		}
+	}
+	// collect galaxy coords
+	var galaxies []coord
+	for r := range lines {
+		for c := range lines[r] {
+			if grid[r][c] == '#' {
+				galaxies = append(galaxies, coord{r: r, c: c})
+			}
+		}
+	}
+	// Check all pairs of galaxies and add a correction for empty space.
+	// For each empty row and col between them.
+	// The shortest distance is just the dist between rows + dist between cols.
+	res := 0
+	expandBy := 1
+	for i, src := range galaxies {
+		for j := i + 1; j < len(galaxies); j++ {
+			dest := coord{r: galaxies[j].r, c: galaxies[j].c}
+			dist := int(math.Abs(float64(dest.r-src.r)) + math.Abs(float64(dest.c-src.c)))
+			for _, emptyRow := range emptyRows {
+				if emptyRow >= min(src.r, dest.r) && emptyRow <= max(src.r, dest.r) {
+					dist += expandBy
+				}
+			}
+			for _, emptyCol := range emptyCols {
+				if emptyCol >= min(src.c, dest.c) && emptyCol <= max(src.c, dest.c) {
+					dist += expandBy
+				}
+			}
+			res += dist
+		}
+	}
 
-	return 0
+	return res
 }
 
 func year2023Day11Part2(data string) int {
+	lines := strings.Fields(data)
+	grid := make([][]byte, len(lines))
+	for r := range lines {
+		grid[r] = make([]byte, len(lines[r]))
+		for c := range lines[r] {
+			grid[r][c] = lines[r][c]
+		}
+	}
+	var emptyRows []int
+	for r := range grid {
+		empty := true
+		for c := range grid[r] {
+			if grid[r][c] == '#' {
+				empty = false
+			}
+		}
+		if empty {
+			emptyRows = append(emptyRows, r)
+		}
+	}
+	var emptyCols []int
+	for c := range grid {
+		empty := true
+		for r := range grid[c] {
+			if grid[r][c] == '#' {
+				empty = false
+			}
+		}
+		if empty {
+			emptyCols = append(emptyCols, c)
+		}
+	}
+	var galaxies []coord
+	for r := range lines {
+		for c := range lines[r] {
+			if grid[r][c] == '#' {
+				galaxies = append(galaxies, coord{r: r, c: c})
+			}
+		}
+	}
+	res := 0
+	expandBy := int(math.Pow(10, 6) - 1) // only diff between part 1 and 2
+	for i, src := range galaxies {
+		for j := i; j < len(galaxies); j++ {
+			dest := coord{r: galaxies[j].r, c: galaxies[j].c}
+			dist := int(math.Abs(float64(dest.r-src.r)) + math.Abs(float64(dest.c-src.c)))
+			for _, emptyRow := range emptyRows {
+				if emptyRow >= min(src.r, dest.r) && emptyRow <= max(src.r, dest.r) {
+					dist += expandBy
+				}
+			}
+			for _, emptyCol := range emptyCols {
+				if emptyCol >= min(src.c, dest.c) && emptyCol <= max(src.c, dest.c) {
+					dist += expandBy
+				}
+			}
+			res += dist
+		}
+	}
 
-	return 0
+	return res
 }
 
 func (s Solution[T]) Year2023Day12(path string) (int, int) {

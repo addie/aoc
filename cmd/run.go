@@ -11,7 +11,7 @@ import (
 var DemoFlag bool
 
 func init() {
-	runCmd.Flags().BoolVar(&DemoFlag, "demo", false, "Use demo input")
+	runCmd.Flags().BoolVarP(&DemoFlag, "demo", "d", false, "Use demo input")
 	rootCmd.AddCommand(runCmd)
 }
 
