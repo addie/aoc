@@ -1123,26 +1123,84 @@ func year2023Day14Part2(data string) int {
 
 func (s Solution[T]) Year2023Day15(path string) (int, int) {
 	data := ReadFileToString(path)
-	res1 := year2023Day15Part1(data)
-	res2 := year2023Day15Part2(data)
+	seqs := strings.Split(data, ",")
+	hash := func(seq string) int {
+		curr := 0
+		for i := 0; i < len(seq); i++ {
+			curr += int(seq[i])
+			curr *= 17
+			curr %= 256
+		}
+		return curr
+	}
+	res1 := func() int {
+		res := 0
+		for _, seq := range seqs {
+			hashVal := hash(seq)
+			res += hashVal
+
+		}
+		return res
+	}()
+	res2 := func() int {
+		boxes := make([][]string, 256)
+		res := 0
+
+		for _, seq := range seqs {
+			var vv []string
+			isEquals := false
+			if strings.ContainsAny(seq, "=") {
+				vv = strings.Split(seq, "=")
+				isEquals = true
+			} else {
+				vv = strings.Split(seq, "-")
+			}
+			label := vv[0]
+			boxNo := hash(label)
+			if isEquals {
+				found := false
+				for j := range boxes[boxNo] {
+					if strings.HasPrefix(boxes[boxNo][j], label) {
+						found = true
+						boxes[boxNo][j] = seq
+						break
+					}
+				}
+				if !found {
+					boxes[boxNo] = append(boxes[boxNo], seq)
+				}
+			} else {
+				boxes[boxNo] = slices.DeleteFunc(boxes[boxNo], func(s string) bool {
+					return strings.HasPrefix(s, label)
+				})
+			}
+			// fmt.Printf("After \"%v\":\n", seq)
+			// for i, box := range boxes {
+			// 	if len(box) == 0 {
+			// 		continue
+			// 	}
+			// 	fmt.Printf("Box %d: %v\n", i, box)
+			// }
+			// fmt.Println()
+		}
+		for i, box := range boxes {
+			if len(box) == 0 {
+				continue
+			}
+			for j, lens := range box {
+				focalLen := toInt(strings.Split(lens, "=")[1])
+				res += (1 + i) * (j + 1) * focalLen
+			}
+		}
+		return res
+	}()
 	return res1, res2
-}
-
-func year2023Day15Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day15Part2(data string) int {
-
-	return 0
 }
 
 func (s Solution[T]) Year2023Day16(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day16Part1(data)
-	res2 := year2023Day16Part2(data)
-	return res1, res2
+
+	return 0, 0
+
 }
 
 func year2023Day16Part1(data string) int {

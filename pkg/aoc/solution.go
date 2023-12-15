@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 )
 
 type Solution[T any] struct {
@@ -67,7 +68,7 @@ func ReadFile(filename string) []string {
 }
 
 func ReadFileToString(filename string) string {
-	return string(Must(os.ReadFile(filename)))
+	return strings.TrimSuffix(string(Must(os.ReadFile(filename))), "\n")
 }
 
 func ReadFileToGrid(filename string) [][]byte {
