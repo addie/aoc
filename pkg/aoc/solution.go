@@ -82,7 +82,7 @@ func ReadFileToGrid(filename string) [][]byte {
 	}
 	grid := make([][]byte, len(lines))
 	for r := range grid {
-		grid[r] = make([]byte, len(grid[0]))
+		grid[r] = make([]byte, len(lines[0]))
 	}
 	for r := range lines {
 		for c := range lines[r] {

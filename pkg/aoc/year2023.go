@@ -888,7 +888,7 @@ func day10BFS(grid [][]rune, s coord) [][]int {
 			nextR := curr.coord.r + move.r
 			nextC := curr.coord.c + move.c
 			next := coord{nextR, nextC}
-			if day10InBounds(grid, next) && day10MovePermitted(grid, move, next) {
+			if inBounds(grid, next) && day10MovePermitted(grid, move, next) {
 				queue = append(queue, el{coord{next.r, next.c}, curr.dist + 1})
 			}
 		}
@@ -911,10 +911,6 @@ func day10MovePermitted(grid [][]rune, move coord, next coord) bool {
 		return true
 	}
 	return false
-}
-
-func day10InBounds(grid [][]rune, n coord) bool {
-	return n.r >= 0 && n.r < len(grid) && n.c >= 0 && n.c < len(grid[0])
 }
 
 func day10FindStart(grid [][]rune) *coord {
@@ -1071,54 +1067,21 @@ func year2023Day11Part2(data string) int {
 }
 
 func (s Solution[T]) Year2023Day12(path string) (int, int) {
-	grid := ReadFileToGrid(path)
-	res1 := year2023Day12Part1(grid)
-	res2 := year2023Day12Part2(grid)
+	_ = ReadFileToString(path)
+	res1, res2 := 0, 0
 	return res1, res2
-}
-
-func year2023Day12Part1(grid [][]byte) int {
-	fmt.Println(grid)
-	return 0
-}
-
-func year2023Day12Part2(grid [][]byte) int {
-	fmt.Println(grid)
-	return 0
 }
 
 func (s Solution[T]) Year2023Day13(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day13Part1(data)
-	res2 := year2023Day13Part2(data)
+	_ = ReadFileToString(path)
+	res1, res2 := 0, 0
 	return res1, res2
-}
-
-func year2023Day13Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day13Part2(data string) int {
-
-	return 0
 }
 
 func (s Solution[T]) Year2023Day14(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day14Part1(data)
-	res2 := year2023Day14Part2(data)
+	_ = ReadFileToString(path)
+	res1, res2 := 0, 0
 	return res1, res2
-}
-
-func year2023Day14Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day14Part2(data string) int {
-
-	return 0
 }
 
 func (s Solution[T]) Year2023Day15(path string) (int, int) {
@@ -1197,171 +1160,277 @@ func (s Solution[T]) Year2023Day15(path string) (int, int) {
 	return res1, res2
 }
 
+type coordDirection struct {
+	coord coord
+	dir   direction
+}
+
 func (s Solution[T]) Year2023Day16(path string) (int, int) {
-
-	return 0, 0
-
-}
-
-func year2023Day16Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day16Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day17(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day17Part1(data)
-	res2 := year2023Day17Part2(data)
+	grid := ReadFileToGrid(path)
+	res1, res2 := 0, 0
+	for _, p2 := range []bool{false, true} {
+		var tiles []coordDirection
+		if p2 {
+			for r := range grid {
+				tiles = append(tiles, coordDirection{
+					coord{r: r, c: 0}, east,
+				})
+				tiles = append(tiles, coordDirection{
+					coord{r: r, c: len(grid[0]) - 1}, west,
+				})
+			}
+			for c := range grid[0] {
+				tiles = append(tiles, coordDirection{
+					coord{r: 0, c: c}, south,
+				})
+				tiles = append(tiles, coordDirection{
+					coord{r: len(grid) - 1, c: c}, north,
+				})
+			}
+		} else {
+			tiles = []coordDirection{
+				{
+					coord: coord{r: 0, c: 0},
+					dir:   east,
+				},
+			}
+		}
+		maxVal := 0
+		for _, tile := range tiles {
+			res := 0
+			visited := make(map[coordDirection]bool)
+			unique := make(map[coord]bool)
+			visit(grid, tile, visited)
+			for k := range visited {
+				n := k.coord
+				unique[n] = true
+			}
+			res = len(unique)
+			maxVal = max(maxVal, res)
+		}
+		if p2 {
+			res2 = maxVal
+		} else {
+			res1 = maxVal
+		}
+	}
 	return res1, res2
 }
 
-func year2023Day17Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day17Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day18(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day18Part1(data)
-	res2 := year2023Day18Part2(data)
-	return res1, res2
-}
-
-func year2023Day18Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day18Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day19(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day19Part1(data)
-	res2 := year2023Day19Part2(data)
-	return res1, res2
-}
-
-func year2023Day19Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day19Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day20(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day20Part1(data)
-	res2 := year2023Day20Part2(data)
-	return res1, res2
-}
-
-func year2023Day20Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day20Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day21(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day21Part1(data)
-	res2 := year2023Day21Part2(data)
-	return res1, res2
-}
-
-func year2023Day21Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day21Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day22(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day22Part1(data)
-	res2 := year2023Day22Part2(data)
-	return res1, res2
-}
-
-func year2023Day22Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day22Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day23(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day23Part1(data)
-	res2 := year2023Day23Part2(data)
-	return res1, res2
-}
-
-func year2023Day23Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day23Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day24(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day24Part1(data)
-	res2 := year2023Day24Part2(data)
-	return res1, res2
-}
-
-func year2023Day24Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day24Part2(data string) int {
-
-	return 0
-}
-
-func (s Solution[T]) Year2023Day25(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day25Part1(data)
-	res2 := year2023Day25Part2(data)
-	return res1, res2
-}
-
-func year2023Day25Part1(data string) int {
-
-	return 0
-}
-
-func year2023Day25Part2(data string) int {
-
-	return 0
+func visit(grid [][]byte, cd coordDirection, visited map[coordDirection]bool) {
+	getNext := func(curr coord, char byte, dir direction) []coordDirection {
+		switch dir {
+		case north:
+			switch char {
+			case '|', '.':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r - 1,
+							c: curr.c,
+						},
+						dir: north,
+					},
+				}
+			case '\\':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c - 1,
+						},
+						dir: west,
+					},
+				}
+			case '/':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c + 1,
+						},
+						dir: east,
+					},
+				}
+			case '-':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c - 1,
+						},
+						dir: west,
+					},
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c + 1,
+						},
+						dir: east,
+					},
+				}
+			}
+		case south:
+			switch char {
+			case '|', '.':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r + 1,
+							c: curr.c,
+						},
+						dir: south,
+					},
+				}
+			case '\\':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c + 1,
+						},
+						dir: east,
+					},
+				}
+			case '/':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c - 1,
+						},
+						dir: west,
+					},
+				}
+			case '-':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c - 1,
+						},
+						dir: west,
+					},
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c + 1,
+						},
+						dir: east,
+					},
+				}
+			}
+		case east:
+			switch char {
+			case '|':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r - 1,
+							c: curr.c,
+						},
+						dir: north,
+					},
+					{
+						coord: coord{
+							r: curr.r + 1,
+							c: curr.c,
+						},
+						dir: south,
+					},
+				}
+			case '\\':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r + 1,
+							c: curr.c,
+						},
+						dir: south,
+					},
+				}
+			case '/':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r - 1,
+							c: curr.c,
+						},
+						dir: north,
+					},
+				}
+			case '-', '.':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c + 1,
+						},
+						dir: east,
+					},
+				}
+			}
+		case west:
+			switch char {
+			case '|':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r - 1,
+							c: curr.c,
+						},
+						dir: north,
+					},
+					{
+						coord: coord{
+							r: curr.r + 1,
+							c: curr.c,
+						},
+						dir: south,
+					},
+				}
+			case '\\':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r - 1,
+							c: curr.c,
+						},
+						dir: north,
+					},
+				}
+			case '/':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r + 1,
+							c: curr.c,
+						},
+						dir: south,
+					},
+				}
+			case '-', '.':
+				return []coordDirection{
+					{
+						coord: coord{
+							r: curr.r,
+							c: curr.c - 1,
+						},
+						dir: west,
+					},
+				}
+			}
+		}
+		return nil
+	}
+	curr := cd.coord
+	dir := cd.dir
+	if inBounds(grid, curr) {
+		visited[cd] = true
+		for _, move := range getNext(curr, grid[curr.r][curr.c], dir) {
+			if !visited[move] {
+				visit(grid, move, visited)
+			}
+		}
+	}
 }

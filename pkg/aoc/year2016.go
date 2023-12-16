@@ -8,13 +8,14 @@ import (
 	"strings"
 )
 
-type dir int
+type direction int
 
 const (
-	north = iota
-	east
-	south
-	west
+	unknown direction = -1
+	north   direction = 0
+	east    direction = 1
+	south   direction = 2
+	west    direction = 3
 )
 
 func (s Solution[T]) Year2016Day1(input string) (int, int) {
@@ -38,7 +39,7 @@ func (s Solution[T]) Year2016Day1(input string) (int, int) {
 			facing = new(big.Int).Mod(dividend, divisor).Int64()
 			val := Must(strconv.Atoi(strings.TrimSpace(instruction[1:])))
 			for step := 0; step < val; step++ {
-				switch facing {
+				switch direction(facing) {
 				case north:
 					r--
 				case east:

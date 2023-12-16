@@ -167,7 +167,7 @@ func popleft[T any](alist *[]T) T {
 	return lv
 }
 
-func printStringGrid[T Integer](grid [][]T) {
+func printStringGrid[T string | byte](grid [][]T) {
 	for r := range grid {
 		for c := range grid[r] {
 			fmt.Printf("%s ", string(grid[r][c]))
@@ -183,4 +183,8 @@ func printIntGrid[T Integer](grid [][]T) {
 		}
 		fmt.Println()
 	}
+}
+
+func inBounds[T any](grid [][]T, n coord) bool {
+	return n.r >= 0 && n.r < len(grid) && n.c >= 0 && n.c < len(grid[0])
 }
