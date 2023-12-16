@@ -1160,12 +1160,11 @@ func (s Solution[T]) Year2023Day15(path string) (int, int) {
 	return res1, res2
 }
 
-type coordDirection struct {
-	coord coord
-	dir   direction
-}
-
 func (s Solution[T]) Year2023Day16(path string) (int, int) {
+	type coordDirection struct {
+		coord coord
+		dir   direction
+	}
 	grid := ReadFileToGrid(path)
 	res1, res2 := 0, 0
 	for _, p2 := range []bool{false, true} {
