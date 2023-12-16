@@ -1200,6 +1200,224 @@ func (s Solution[T]) Year2023Day16(path string) (int, int) {
 			res := 0
 			visited := make(map[coordDirection]bool)
 			unique := make(map[coord]bool)
+			var visit func([][]byte, coordDirection, map[coordDirection]bool)
+			visit = func(grid [][]byte, cd coordDirection, visited map[coordDirection]bool) {
+				getNext := func(curr coord, char byte, dir direction) []coordDirection {
+					switch dir {
+					case north:
+						switch char {
+						case '|', '.':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r - 1,
+										c: curr.c,
+									},
+									dir: north,
+								},
+							}
+						case '\\':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c - 1,
+									},
+									dir: west,
+								},
+							}
+						case '/':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c + 1,
+									},
+									dir: east,
+								},
+							}
+						case '-':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c - 1,
+									},
+									dir: west,
+								},
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c + 1,
+									},
+									dir: east,
+								},
+							}
+						}
+					case south:
+						switch char {
+						case '|', '.':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r + 1,
+										c: curr.c,
+									},
+									dir: south,
+								},
+							}
+						case '\\':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c + 1,
+									},
+									dir: east,
+								},
+							}
+						case '/':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c - 1,
+									},
+									dir: west,
+								},
+							}
+						case '-':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c - 1,
+									},
+									dir: west,
+								},
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c + 1,
+									},
+									dir: east,
+								},
+							}
+						}
+					case east:
+						switch char {
+						case '|':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r - 1,
+										c: curr.c,
+									},
+									dir: north,
+								},
+								{
+									coord: coord{
+										r: curr.r + 1,
+										c: curr.c,
+									},
+									dir: south,
+								},
+							}
+						case '\\':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r + 1,
+										c: curr.c,
+									},
+									dir: south,
+								},
+							}
+						case '/':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r - 1,
+										c: curr.c,
+									},
+									dir: north,
+								},
+							}
+						case '-', '.':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c + 1,
+									},
+									dir: east,
+								},
+							}
+						}
+					case west:
+						switch char {
+						case '|':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r - 1,
+										c: curr.c,
+									},
+									dir: north,
+								},
+								{
+									coord: coord{
+										r: curr.r + 1,
+										c: curr.c,
+									},
+									dir: south,
+								},
+							}
+						case '\\':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r - 1,
+										c: curr.c,
+									},
+									dir: north,
+								},
+							}
+						case '/':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r + 1,
+										c: curr.c,
+									},
+									dir: south,
+								},
+							}
+						case '-', '.':
+							return []coordDirection{
+								{
+									coord: coord{
+										r: curr.r,
+										c: curr.c - 1,
+									},
+									dir: west,
+								},
+							}
+						}
+					}
+					return nil
+				}
+				curr := cd.coord
+				dir := cd.dir
+				if inBounds(grid, curr) {
+					visited[cd] = true
+					for _, move := range getNext(curr, grid[curr.r][curr.c], dir) {
+						if !visited[move] {
+							visit(grid, move, visited)
+						}
+					}
+				}
+			}
 			visit(grid, tile, visited)
 			for k := range visited {
 				n := k.coord
@@ -1215,222 +1433,4 @@ func (s Solution[T]) Year2023Day16(path string) (int, int) {
 		}
 	}
 	return res1, res2
-}
-
-func visit(grid [][]byte, cd coordDirection, visited map[coordDirection]bool) {
-	getNext := func(curr coord, char byte, dir direction) []coordDirection {
-		switch dir {
-		case north:
-			switch char {
-			case '|', '.':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r - 1,
-							c: curr.c,
-						},
-						dir: north,
-					},
-				}
-			case '\\':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c - 1,
-						},
-						dir: west,
-					},
-				}
-			case '/':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c + 1,
-						},
-						dir: east,
-					},
-				}
-			case '-':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c - 1,
-						},
-						dir: west,
-					},
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c + 1,
-						},
-						dir: east,
-					},
-				}
-			}
-		case south:
-			switch char {
-			case '|', '.':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r + 1,
-							c: curr.c,
-						},
-						dir: south,
-					},
-				}
-			case '\\':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c + 1,
-						},
-						dir: east,
-					},
-				}
-			case '/':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c - 1,
-						},
-						dir: west,
-					},
-				}
-			case '-':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c - 1,
-						},
-						dir: west,
-					},
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c + 1,
-						},
-						dir: east,
-					},
-				}
-			}
-		case east:
-			switch char {
-			case '|':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r - 1,
-							c: curr.c,
-						},
-						dir: north,
-					},
-					{
-						coord: coord{
-							r: curr.r + 1,
-							c: curr.c,
-						},
-						dir: south,
-					},
-				}
-			case '\\':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r + 1,
-							c: curr.c,
-						},
-						dir: south,
-					},
-				}
-			case '/':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r - 1,
-							c: curr.c,
-						},
-						dir: north,
-					},
-				}
-			case '-', '.':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c + 1,
-						},
-						dir: east,
-					},
-				}
-			}
-		case west:
-			switch char {
-			case '|':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r - 1,
-							c: curr.c,
-						},
-						dir: north,
-					},
-					{
-						coord: coord{
-							r: curr.r + 1,
-							c: curr.c,
-						},
-						dir: south,
-					},
-				}
-			case '\\':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r - 1,
-							c: curr.c,
-						},
-						dir: north,
-					},
-				}
-			case '/':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r + 1,
-							c: curr.c,
-						},
-						dir: south,
-					},
-				}
-			case '-', '.':
-				return []coordDirection{
-					{
-						coord: coord{
-							r: curr.r,
-							c: curr.c - 1,
-						},
-						dir: west,
-					},
-				}
-			}
-		}
-		return nil
-	}
-	curr := cd.coord
-	dir := cd.dir
-	if inBounds(grid, curr) {
-		visited[cd] = true
-		for _, move := range getNext(curr, grid[curr.r][curr.c], dir) {
-			if !visited[move] {
-				visit(grid, move, visited)
-			}
-		}
-	}
 }
