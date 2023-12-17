@@ -3,6 +3,8 @@ package aoc
 import (
 	"fmt"
 	"strconv"
+
+	"golang.org/x/exp/constraints"
 )
 
 type coord struct{ r, c int }
@@ -88,7 +90,7 @@ func (t *Trie) StartsWith(prefix string) bool {
 	return true
 }
 
-func Reversed(s string) string {
+func Reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
@@ -99,18 +101,7 @@ func Reversed(s string) string {
 func toInt(s string) int {
 	return Must(strconv.Atoi(s))
 }
-
-type Integer interface {
-	SignedInteger | UnsignedInteger
-}
-type SignedInteger interface {
-	int | int8 | int16 | int32 | int64
-}
-type UnsignedInteger interface {
-	uint | uint8 | uint16 | uint32 | uint64
-}
-
-func toStr[T Integer](i T) string {
+func toStr[T constraints.Integer](i T) string {
 	return strconv.Itoa(int(i))
 }
 
@@ -145,15 +136,6 @@ func mapKeys[K comparable, V any](m map[K]V) []K {
 	return s
 }
 
-func in[T comparable](val T, container []T) bool {
-	for _, v := range container {
-		if v == val {
-			return true
-		}
-	}
-	return false
-}
-
 func pop[T any](alist []T) T {
 	f := len(alist)
 	rv := (alist)[f-1]
@@ -167,6 +149,17 @@ func popleft[T any](alist *[]T) T {
 	return lv
 }
 
+func findStartPosition(grid [][]rune, startChar string) *coord {
+	for r := range grid {
+		for c := range grid[r] {
+			if string(grid[r][c]) == startChar {
+				return &coord{r: r, c: c}
+			}
+		}
+	}
+	return nil
+}
+
 func printStringGrid[T string | byte](grid [][]T) {
 	for r := range grid {
 		for c := range grid[r] {
@@ -174,17 +167,59 @@ func printStringGrid[T string | byte](grid [][]T) {
 		}
 		fmt.Println()
 	}
+	fmt.Println()
 }
 
-func printIntGrid[T Integer](grid [][]T) {
+func printIntGrid[T constraints.Integer](grid [][]T) {
 	for r := range grid {
 		for c := range grid[r] {
 			fmt.Printf("%d ", grid[r][c])
 		}
 		fmt.Println()
 	}
+	fmt.Println()
 }
 
-func inBounds[T any](grid [][]T, n coord) bool {
-	return n.r >= 0 && n.r < len(grid) && n.c >= 0 && n.c < len(grid[0])
+func inBounds(r, c, R, C int) bool {
+	return r >= 0 && r < R && c >= 0 && c < C
+}
+
+type Tuple2[T1 any, T2 any] struct {
+	v1 T1
+	v2 T2
+}
+
+type Tuple3[T1 any, T2 any, T3 any] struct {
+	v1 T1
+	v2 T2
+	v3 T3
+}
+
+type Tuple4[T any] struct {
+	v1, v2, v3, v4 T
+}
+
+type Tuple5[T any] struct {
+	v1, v2, v3, v4, v5 T
+}
+
+type Tuple interface {
+	Tuple2[any, any] | Tuple3[any, any, any] | Tuple4[any] | Tuple5[any]
+}
+type PriorityQueue[T constraints.Ordered] []*Tuple5[T]
+
+func (pq PriorityQueue[T]) Len() int           { return len(pq) }
+func (pq PriorityQueue[T]) Less(i, j int) bool { return pq[i].v1 < pq[j].v1 }
+func (pq PriorityQueue[T]) Swap(i, j int)      { pq[i], pq[j] = pq[j], pq[i] }
+
+func (pq *PriorityQueue[T]) Push(x interface{}) {
+	*pq = append(*pq, x.(*Tuple5[T]))
+}
+
+func (pq *PriorityQueue[T]) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	x := old[n-1]
+	*pq = old[0 : n-1]
+	return x
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func (s Solution[T]) Year2021Day1(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	numIncreases1 := 0
 	for i := range lines {
 		if i == 0 {
@@ -43,7 +43,7 @@ type pos struct {
 }
 
 func (s Solution[T]) Year2021Day2(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 
 	res := pos{}
 	for _, line := range lines {
@@ -91,7 +91,7 @@ func (s Solution[T]) Year2021Day3(input string) (int, int) {
 	}
 	oneCount := make(map[int]int)
 	initCount(oneCount)
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	for _, dat := range lines {
 		for i, digit := range dat {
 			if string(digit) == "1" {
@@ -182,7 +182,7 @@ func (s Solution[T]) Year2021Day3(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2021Day4(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	var moves []string
 	var boards [][][]string
 	var board [][]string
@@ -420,7 +420,7 @@ func (s Solution[T]) Year2021Day5(input string) (int, int) {
 	}
 
 	var cp []coordPair
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	for _, line := range lines {
 		row := strings.Split(line, " -> ")
 		cp = append(cp, coordPair{
@@ -449,61 +449,61 @@ func (s Solution[T]) Year2021Day5(input string) (int, int) {
 
 //
 // func (s Solution[T]) Year2021Day6(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day7(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day8(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day9(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day10(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day11(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day12(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day13(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day14(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day15(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day16(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }
 //
 // func (s Solution[T]) Year2021Day17(input string) (int, int) {
-// 	lines := ReadFile(input)
+// 	lines := ReadFileToLines(input)
 //
 // }

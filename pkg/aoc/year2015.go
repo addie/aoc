@@ -9,7 +9,7 @@ import (
 )
 
 func (s Solution[T]) Year2015Day1(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	m := map[string]int{"(": 1, ")": -1}
 	res1, res2 := 0, 0
 	for i, char := range lines[0] {
@@ -22,7 +22,7 @@ func (s Solution[T]) Year2015Day1(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2015Day2(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	res1, res2 := 0, 0
 
 	for _, line := range lines {
@@ -114,7 +114,7 @@ func (s Solution[T]) Year2015Day4(path string) (int, int) {
 }
 
 func (s Solution[T]) Year2015Day5(path string) (int, int) {
-	lines := ReadFile(path)
+	lines := ReadFileToLines(path)
 	vowels := map[rune]bool{'a': true, 'e': true, 'i': true, 'o': true, 'u': true}
 	bannedChars := map[string]bool{"ab": true, "cd": true, "pq": true, "xy": true}
 	p1, p2 := 0, 0

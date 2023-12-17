@@ -2,6 +2,7 @@ package aoc
 
 import (
 	"cmp"
+	"container/heap"
 	"fmt"
 	"maps"
 	"math"
@@ -15,7 +16,7 @@ import (
 )
 
 func (s Solution[T]) Year2023Day1(path string) (int, int) {
-	data := ReadFile(path)
+	data := ReadFileToLines(path)
 	res1 := year2023Day1Part1(data)
 	res2 := year2023Day1Part2(data)
 	return res1, res2
@@ -76,7 +77,7 @@ func findDigits(numMap map[string]int, line string) []int {
 }
 
 func (s Solution[T]) Year2023Day2(path string) (int, int) {
-	data := ReadFile(path)
+	data := ReadFileToLines(path)
 	res1 := year2023Day2Part1(data)
 	res2 := year2023Day2Part2(data)
 	return res1, res2
@@ -155,7 +156,7 @@ func year2023Day2Part2(data []string) int {
 }
 
 func (s Solution[T]) Year2023Day3(path string) (int, int) {
-	data := ReadFile(path)
+	data := ReadFileToLines(path)
 	res1 := year2023Day3Part1(data)
 	res2 := year2023Day3Part2(data)
 	return res1, res2
@@ -282,7 +283,7 @@ func year2023Day3Part2(data []string) int {
 }
 
 func (s Solution[T]) Year2023Day4(path string) (int, int) {
-	data := ReadFile(path)
+	data := ReadFileToLines(path)
 	res1 := year2023Day4Part1(data)
 	res2 := year2023Day4Part2(data)
 	return res1, res2
@@ -818,28 +819,13 @@ func year2023Day8Part2(data string) int {
 }
 
 func (s Solution[T]) Year2023Day9(path string) (int, int) {
-	data := ReadFileToString(path)
-	res1 := year2023Day9Part1(data)
-	res2 := year2023Day9Part2(data)
+	_ = ReadFileToString(path)
+	res1, res2 := 0, 0
 	return res1, res2
-}
-
-func year2023Day9Part1(data string) int {
-	return 0
-}
-
-func year2023Day9Part2(data string) int {
-	return 0
 }
 
 func (s Solution[T]) Year2023Day10(path string) (int, int) {
 	data := ReadFileToString(path)
-	res1 := year2023Day10Part1(data)
-	res2 := year2023Day10Part2(data)
-	return res1, res2
-}
-
-func year2023Day10Part1(data string) int {
 	lines := strings.Fields(data)
 	grid := make([][]rune, len(lines))
 	for r := range lines {
@@ -848,31 +834,24 @@ func year2023Day10Part1(data string) int {
 			grid[r][c] = rune(lines[r][c])
 		}
 	}
-	s := day10FindStart(grid)
-	dists := day10BFS(grid, *s)
+	start := findStartPosition(grid, "S")
+	dists := day10BFS(grid, *start)
 	m := dists[0][0]
 	for r := range dists {
 		for c := range dists[r] {
 			m = max(m, dists[r][c])
 		}
 	}
-	return m
-}
-
-func year2023Day10Part2(data string) int {
-	return 0
+	return m, 0
 }
 
 func day10BFS(grid [][]rune, s coord) [][]int {
-	type el struct {
-		coord coord
-		dist  int
-	}
-	queue := []el{{coord: s, dist: 0}}
+	queue := []Tuple2[coord, int]{{s, 0}}
 	moves := []coord{Up, Down, Left, Right}
 	dists := make([][]int, len(grid))
+	R, C := len(grid), len(grid[0])
 	for r := range grid {
-		dists[r] = make([]int, len(grid[0]))
+		dists[r] = make([]int, C)
 		for c := range grid[r] {
 			dists[r][c] = -1
 		}
@@ -880,16 +859,16 @@ func day10BFS(grid [][]rune, s coord) [][]int {
 	for len(queue) > 0 {
 		curr := queue[0]
 		queue = queue[1:]
-		if dists[curr.coord.r][curr.coord.c] >= 0 {
+		if dists[curr.v1.r][curr.v1.c] >= 0 {
 			continue
 		}
-		dists[curr.coord.r][curr.coord.c] = curr.dist
+		dists[curr.v1.r][curr.v1.c] = curr.v2
 		for _, move := range moves {
-			nextR := curr.coord.r + move.r
-			nextC := curr.coord.c + move.c
+			nextR := curr.v1.r + move.r
+			nextC := curr.v1.c + move.c
 			next := coord{nextR, nextC}
-			if inBounds(grid, next) && day10MovePermitted(grid, move, next) {
-				queue = append(queue, el{coord{next.r, next.c}, curr.dist + 1})
+			if inBounds(nextR, nextC, R, C) && day10MovePermitted(grid, move, next) {
+				queue = append(queue, Tuple2[coord, int]{coord{next.r, next.c}, curr.v2 + 1})
 			}
 		}
 	}
@@ -913,25 +892,9 @@ func day10MovePermitted(grid [][]rune, move coord, next coord) bool {
 	return false
 }
 
-func day10FindStart(grid [][]rune) *coord {
-	for r := range grid {
-		for c := range grid[r] {
-			if string(grid[r][c]) == "S" {
-				return &coord{r: r, c: c}
-			}
-		}
-	}
-	return nil
-}
-
 func (s Solution[T]) Year2023Day11(path string) (int, int) {
 	data := ReadFileToString(path)
-	res1 := year2023Day11Part1(data)
-	res2 := year2023Day11Part2(data)
-	return res1, res2
-}
-
-func year2023Day11Part1(data string) int {
+	res1, res2 := 0, 0
 	lines := strings.Fields(data)
 	// build grid
 	grid := make([][]byte, len(lines))
@@ -979,91 +942,37 @@ func year2023Day11Part1(data string) int {
 	// Check all pairs of galaxies and add a correction for empty space.
 	// For each empty row and col between them.
 	// The shortest distance is just the dist between rows + dist between cols.
-	res := 0
-	expandBy := 1
-	for i, src := range galaxies {
-		for j := i + 1; j < len(galaxies); j++ {
-			dest := coord{r: galaxies[j].r, c: galaxies[j].c}
-			dist := int(math.Abs(float64(dest.r-src.r)) + math.Abs(float64(dest.c-src.c)))
-			for _, emptyRow := range emptyRows {
-				if emptyRow >= min(src.r, dest.r) && emptyRow <= max(src.r, dest.r) {
-					dist += expandBy
+	for _, p2 := range []bool{false, true} {
+		res := 0
+		expandBy := 1
+		if p2 {
+			expandBy = int(math.Pow(10, 6) - 1)
+		}
+		for i, src := range galaxies {
+			for j := i + 1; j < len(galaxies); j++ {
+				dest := coord{r: galaxies[j].r, c: galaxies[j].c}
+				dist := int(math.Abs(float64(dest.r-src.r)) + math.Abs(float64(dest.c-src.c)))
+				for _, emptyRow := range emptyRows {
+					if emptyRow >= min(src.r, dest.r) && emptyRow <= max(src.r, dest.r) {
+						dist += expandBy
+					}
 				}
-			}
-			for _, emptyCol := range emptyCols {
-				if emptyCol >= min(src.c, dest.c) && emptyCol <= max(src.c, dest.c) {
-					dist += expandBy
+				for _, emptyCol := range emptyCols {
+					if emptyCol >= min(src.c, dest.c) && emptyCol <= max(src.c, dest.c) {
+						dist += expandBy
+					}
 				}
+				res += dist
 			}
-			res += dist
+		}
+		if p2 {
+			res2 = res
+		} else {
+			res1 = res
 		}
 	}
 
-	return res
-}
-
-func year2023Day11Part2(data string) int {
-	lines := strings.Fields(data)
-	grid := make([][]byte, len(lines))
-	for r := range lines {
-		grid[r] = make([]byte, len(lines[r]))
-		for c := range lines[r] {
-			grid[r][c] = lines[r][c]
-		}
-	}
-	var emptyRows []int
-	for r := range grid {
-		empty := true
-		for c := range grid[r] {
-			if grid[r][c] == '#' {
-				empty = false
-			}
-		}
-		if empty {
-			emptyRows = append(emptyRows, r)
-		}
-	}
-	var emptyCols []int
-	for c := range grid {
-		empty := true
-		for r := range grid[c] {
-			if grid[r][c] == '#' {
-				empty = false
-			}
-		}
-		if empty {
-			emptyCols = append(emptyCols, c)
-		}
-	}
-	var galaxies []coord
-	for r := range lines {
-		for c := range lines[r] {
-			if grid[r][c] == '#' {
-				galaxies = append(galaxies, coord{r: r, c: c})
-			}
-		}
-	}
-	res := 0
-	expandBy := int(math.Pow(10, 6) - 1) // only diff between part 1 and 2
-	for i, src := range galaxies {
-		for j := i; j < len(galaxies); j++ {
-			dest := coord{r: galaxies[j].r, c: galaxies[j].c}
-			dist := int(math.Abs(float64(dest.r-src.r)) + math.Abs(float64(dest.c-src.c)))
-			for _, emptyRow := range emptyRows {
-				if emptyRow >= min(src.r, dest.r) && emptyRow <= max(src.r, dest.r) {
-					dist += expandBy
-				}
-			}
-			for _, emptyCol := range emptyCols {
-				if emptyCol >= min(src.c, dest.c) && emptyCol <= max(src.c, dest.c) {
-					dist += expandBy
-				}
-			}
-			res += dist
-		}
-	}
-
-	return res
+	return res1, res2
 }
 
 func (s Solution[T]) Year2023Day12(path string) (int, int) {
@@ -1161,254 +1070,248 @@ func (s Solution[T]) Year2023Day15(path string) (int, int) {
 }
 
 func (s Solution[T]) Year2023Day16(path string) (int, int) {
-	type coordDirection struct {
-		coord coord
-		dir   direction
-	}
-	grid := ReadFileToGrid(path)
+	grid := ReadFileToByteGrid(path)
+	R, C := len(grid), len(grid[0])
 	res1, res2 := 0, 0
 	for _, p2 := range []bool{false, true} {
-		var tiles []coordDirection
+		var tiles []Tuple2[coord, direction]
 		if p2 {
 			for r := range grid {
-				tiles = append(tiles, coordDirection{
+				tiles = append(tiles, Tuple2[coord, direction]{
 					coord{r: r, c: 0}, east,
 				})
-				tiles = append(tiles, coordDirection{
+				tiles = append(tiles, Tuple2[coord, direction]{
 					coord{r: r, c: len(grid[0]) - 1}, west,
 				})
 			}
 			for c := range grid[0] {
-				tiles = append(tiles, coordDirection{
+				tiles = append(tiles, Tuple2[coord, direction]{
 					coord{r: 0, c: c}, south,
 				})
-				tiles = append(tiles, coordDirection{
+				tiles = append(tiles, Tuple2[coord, direction]{
 					coord{r: len(grid) - 1, c: c}, north,
 				})
 			}
 		} else {
-			tiles = []coordDirection{
-				{
-					coord: coord{r: 0, c: 0},
-					dir:   east,
-				},
+			tiles = []Tuple2[coord, direction]{
+				{coord{r: 0, c: 0}, east},
 			}
 		}
 		maxVal := 0
 		for _, tile := range tiles {
 			res := 0
-			visited := make(map[coordDirection]bool)
+			visited := make(map[Tuple2[coord, direction]]bool)
 			unique := make(map[coord]bool)
-			var visit func([][]byte, coordDirection, map[coordDirection]bool)
-			visit = func(grid [][]byte, cd coordDirection, visited map[coordDirection]bool) {
-				getNext := func(curr coord, char byte, dir direction) []coordDirection {
+			var visit func([][]byte, Tuple2[coord, direction], map[Tuple2[coord, direction]]bool)
+			visit = func(grid [][]byte, cd Tuple2[coord, direction], visited map[Tuple2[coord, direction]]bool) {
+				getNext := func(curr coord, char byte, dir direction) []Tuple2[coord, direction] {
 					switch dir {
 					case north:
 						switch char {
 						case '|', '.':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r - 1,
 										c: curr.c,
 									},
-									dir: north,
+									north,
 								},
 							}
 						case '\\':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c - 1,
 									},
-									dir: west,
+									west,
 								},
 							}
 						case '/':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c + 1,
 									},
-									dir: east,
+									east,
 								},
 							}
 						case '-':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c - 1,
 									},
-									dir: west,
+									west,
 								},
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c + 1,
 									},
-									dir: east,
+									east,
 								},
 							}
 						}
 					case south:
 						switch char {
 						case '|', '.':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r + 1,
 										c: curr.c,
 									},
-									dir: south,
+									south,
 								},
 							}
 						case '\\':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c + 1,
 									},
-									dir: east,
+									east,
 								},
 							}
 						case '/':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c - 1,
 									},
-									dir: west,
+									west,
 								},
 							}
 						case '-':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c - 1,
 									},
-									dir: west,
+									west,
 								},
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c + 1,
 									},
-									dir: east,
+									east,
 								},
 							}
 						}
 					case east:
 						switch char {
 						case '|':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r - 1,
 										c: curr.c,
 									},
-									dir: north,
+									north,
 								},
 								{
-									coord: coord{
+									coord{
 										r: curr.r + 1,
 										c: curr.c,
 									},
-									dir: south,
+									south,
 								},
 							}
 						case '\\':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r + 1,
 										c: curr.c,
 									},
-									dir: south,
+									south,
 								},
 							}
 						case '/':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r - 1,
 										c: curr.c,
 									},
-									dir: north,
+									north,
 								},
 							}
 						case '-', '.':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c + 1,
 									},
-									dir: east,
+									east,
 								},
 							}
 						}
 					case west:
 						switch char {
 						case '|':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r - 1,
 										c: curr.c,
 									},
-									dir: north,
+									north,
 								},
 								{
-									coord: coord{
+									coord{
 										r: curr.r + 1,
 										c: curr.c,
 									},
-									dir: south,
+									south,
 								},
 							}
 						case '\\':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r - 1,
 										c: curr.c,
 									},
-									dir: north,
+									north,
 								},
 							}
 						case '/':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r + 1,
 										c: curr.c,
 									},
-									dir: south,
+									south,
 								},
 							}
 						case '-', '.':
-							return []coordDirection{
+							return []Tuple2[coord, direction]{
 								{
-									coord: coord{
+									coord{
 										r: curr.r,
 										c: curr.c - 1,
 									},
-									dir: west,
+									west,
 								},
 							}
 						}
 					}
 					return nil
 				}
-				curr := cd.coord
-				dir := cd.dir
-				if inBounds(grid, curr) {
+				curr := cd.v1
+				dir := cd.v2
+				if inBounds(curr.r, curr.c, R, C) {
 					visited[cd] = true
 					for _, move := range getNext(curr, grid[curr.r][curr.c], dir) {
 						if !visited[move] {
@@ -1419,7 +1322,7 @@ func (s Solution[T]) Year2023Day16(path string) (int, int) {
 			}
 			visit(grid, tile, visited)
 			for k := range visited {
-				n := k.coord
+				n := k.v1
 				unique[n] = true
 			}
 			res = len(unique)
@@ -1431,5 +1334,56 @@ func (s Solution[T]) Year2023Day16(path string) (int, int) {
 			res1 = maxVal
 		}
 	}
+	return res1, res2
+}
+
+func (s Solution[T]) Year2023Day17(filepath string) (int, int) {
+	grid := ReadFileToIntGrid(filepath)
+	rows, cols := len(grid), len(grid[0])
+	solve := func(p2 bool) int {
+		res := 0
+		pq := PriorityQueue[int]{{0, 0, 0, -1, -1}} // dist, r, c, dir, inDir
+		heap.Init(&pq)
+		distToCells := make(map[Tuple4[int]]int) // (r, c, dir, inDir) -> dist
+		for len(pq) > 0 {
+			t := heap.Pop(&pq).(*Tuple5[int])
+			dist, r, c, dir, inDir := t.v1, t.v2, t.v3, t.v4, t.v5
+			if _, ok := distToCells[Tuple4[int]{r, c, dir, inDir}]; ok {
+				continue
+			}
+			distToCells[Tuple4[int]{r, c, dir, inDir}] = dist
+			for i, d := range []coord{{-1, 0}, {0, 1}, {1, 0}, {0, -1}} {
+				rr := r + d.r
+				cc := c + d.c
+				if !inBounds(rr, cc, rows, cols) {
+					continue
+				}
+				newDir := i
+				newInDir := inDir + 1
+				if newDir != dir {
+					newInDir = 1
+				}
+				isReverse := (newDir+2)%4 == dir
+				isValid := newInDir <= 3
+				if p2 {
+					isValid = newInDir <= 10 && (newDir == dir || inDir >= 4 || inDir == -1)
+				}
+				if !isReverse && isValid {
+					cost := grid[rr][cc]
+					heap.Push(&pq, &Tuple5[int]{v1: dist + cost, v2: rr, v3: cc, v4: newDir, v5: newInDir})
+				}
+			}
+		}
+		res = math.MaxInt
+		for k, v := range distToCells {
+			r, c := k.v1, k.v2
+			if r == rows-1 && c == cols-1 {
+				res = min(res, v)
+			}
+		}
+		return res
+	}
+	res1 := solve(false)
+	res2 := solve(true)
 	return res1, res2
 }

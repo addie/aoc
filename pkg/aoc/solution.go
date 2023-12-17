@@ -1,12 +1,12 @@
 package aoc
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -55,38 +55,34 @@ func (s Solution[T]) post(level, res int) {
 	}
 }
 
-func ReadFile(filename string) []string {
-	var lines []string
-	readFile := Must(os.Open(filename))
-	defer readFile.Close()
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	for fileScanner.Scan() {
-		lines = append(lines, fileScanner.Text())
-	}
-	return lines
+func ReadFileToLines(filename string) []string {
+	str := strings.TrimSuffix(string(Must(os.ReadFile(filename))), "\n")
+	return strings.Split(str, "\n")
 }
 
 func ReadFileToString(filename string) string {
 	return strings.TrimSuffix(string(Must(os.ReadFile(filename))), "\n")
 }
 
-func ReadFileToGrid(filename string) [][]byte {
-	var lines []string
-	readFile := Must(os.Open(filename))
-	defer readFile.Close()
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	for fileScanner.Scan() {
-		lines = append(lines, fileScanner.Text())
-	}
-	grid := make([][]byte, len(lines))
-	for r := range grid {
-		grid[r] = make([]byte, len(lines[0]))
-	}
+func ReadFileToIntGrid(filename string) [][]int {
+	str := strings.TrimSuffix(string(Must(os.ReadFile(filename))), "\n")
+	lines := strings.Split(str, "\n")
+	grid := make([][]int, len(lines))
 	for r := range lines {
-		for c := range lines[r] {
-			grid[r][c] = lines[r][c]
+		for _, v := range lines[r] {
+			grid[r] = append(grid[r], Must(strconv.Atoi(string(v))))
+		}
+	}
+	return grid
+}
+
+func ReadFileToByteGrid(filename string) [][]byte {
+	str := strings.TrimSuffix(string(Must(os.ReadFile(filename))), "\n")
+	lines := strings.Split(str, "\n")
+	grid := make([][]byte, len(lines))
+	for r := range lines {
+		for _, v := range lines[r] {
+			grid[r] = append(grid[r], byte(v))
 		}
 	}
 	return grid

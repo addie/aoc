@@ -9,7 +9,7 @@ import (
 )
 
 func (s Solution[T]) Year2022Day1(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 
 	currentTotal := 0
 	maxTotal := 0
@@ -31,7 +31,7 @@ func (s Solution[T]) Year2022Day1(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2022Day2(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 
 	// Opp A for Rock, B for Paper, and C for Scissors
 	// Me X for Rock, Y for Paper, and Z for Scissors
@@ -102,7 +102,7 @@ func (s Solution[T]) Year2022Day2(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2022Day3(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	// Lowercase item types a through z have priorities 1 through 26.
 	// Uppercase item types A through Z have priorities 27 through 52.
 	const lowerFactor int32 = 96
@@ -153,7 +153,7 @@ func (s Solution[T]) Year2022Day3(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2022Day4(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	type interval struct {
 		s, e int
 	}
@@ -201,7 +201,7 @@ func (s Solution[T]) Year2022Day4(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2022Day5(input string) (string, string) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 
 	// STACKS
 	//             [L] [M]         [M]
@@ -276,7 +276,7 @@ func (s Solution[T]) Year2022Day5(input string) (string, string) {
 }
 
 func (s Solution[T]) Year2022Day6(input string) (int, int) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 
 	check := func(alphaList []int) bool {
 		for _, el := range alphaList {
@@ -318,7 +318,7 @@ func (s Solution[T]) Year2022Day7(input string) (int, int) {
 	// adds the size of abc.txt to //, //a, //a/b in the map.
 	var path []string
 	sizeMap := make(map[string]int)
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	for _, line := range lines {
 		tokens := strings.Split(line, " ")
 		if tokens[1] == "ls" || tokens[0] == "dir" {
@@ -361,7 +361,7 @@ func (s Solution[T]) Year2022Day7(input string) (int, int) {
 func (s Solution[T]) Year2022Day8(input string) (int, int) {
 	var grid [][]int
 	// demo := []string{"30373", "25512", "65332", "33549", "35390"}
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	for _, line := range lines {
 		var row []int
 		for _, c := range line {
@@ -516,7 +516,7 @@ func (s Solution[T]) Year2022Day9(input string) (int, int) {
 	isTouching := func(head coord, tail coord) bool {
 		return math.Abs(float64(head.c)-float64(tail.c)) < 2 && math.Abs(float64(head.r)-float64(tail.r)) < 2
 	}
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	for _, line := range lines {
 		ins := strings.Split(line, " ")
 		dir, count := ins[0], Must(strconv.Atoi(ins[1]))
@@ -574,7 +574,7 @@ func (s Solution[T]) Year2022Day9(input string) (int, int) {
 }
 
 func (s Solution[T]) Year2022Day10(input string) (int, [][]string) {
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	type instr struct {
 		cmd string
 		arg int
@@ -801,7 +801,7 @@ func (s Solution[T]) Year2022Day11() (int, int) {
 func (s Solution[T]) Year2022Day12(input string) (int, int) {
 	st, en := coord{}, coord{}
 	var grid [][]rune
-	lines := ReadFile(input)
+	lines := ReadFileToLines(input)
 	for r, line := range lines {
 		var row []rune
 		for c, col := range line {
