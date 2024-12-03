@@ -67,6 +67,15 @@ fn is_safe_with_dampeners(levels: &Vec<i32>) -> bool {
             .chain(levels[i + 1..].iter())
             .cloned()
             .collect();
+
+        // alternative syntax
+        // let dampened_levels: Vec<_> = levels
+        //     .iter()
+        //     .enumerate()
+        //     .filter(|&(i, _)| i != i)
+        //     .map(|(_, &value)| value)
+        //     .collect();
+
         if is_safe(&dampened_levels) {
             return true;
         }
