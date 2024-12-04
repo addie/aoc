@@ -1,9 +1,11 @@
+use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
-use regex::Regex;
 
-fn main() -> io::Result<()> {
-    let file_path = "data.txt";
+pub fn solution() -> io::Result<()> {
+    let day = "day03";
+
+    let file_path = format!("src/{}/data.txt", day);
     let file = File::open(file_path)?;
 
     // Use a buffered reader
@@ -21,7 +23,8 @@ fn main() -> io::Result<()> {
         let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
         for captures in re.captures_iter(&line) {
             if let (Some(first), Some(second)) = (captures.get(1), captures.get(2)) {
-                sum_of_mults += first.as_str().parse::<i32>().unwrap() * second.as_str().parse::<i32>().unwrap();
+                sum_of_mults += first.as_str().parse::<i32>().unwrap()
+                    * second.as_str().parse::<i32>().unwrap();
             }
         }
 
@@ -41,12 +44,12 @@ fn main() -> io::Result<()> {
             let matched_text = mat.as_str();
             if mult_enabled && regex_a.is_match(matched_text) {
                 // println!("Matched 'mult' pattern: {}", matched_text);
-                if let Some(captures) = regex_a.captures(matched_text) {
-                    if let (Some(first), Some(second)) = (captures.get(1), captures.get(2)) {
-                        let one = first.as_str().parse::<i32>().unwrap();
-                        let two = second.as_str().parse::<i32>().unwrap();
-                        sum_of_mults_2 += one * two;
-                    }
+                if let Some(captures) = regex_a.captures(matched_text)
+                    && let (Some(first), Some(second)) = (captures.get(1), captures.get(2))
+                {
+                    let one = first.as_str().parse::<i32>().unwrap();
+                    let two = second.as_str().parse::<i32>().unwrap();
+                    sum_of_mults_2 += one * two;
                 }
             } else if regex_b.is_match(matched_text) {
                 mult_enabled = true;
@@ -55,9 +58,7 @@ fn main() -> io::Result<()> {
             }
         }
     }
-    println!("Part 1: {}", sum_of_mults);
-    println!("Part 2: {}", sum_of_mults_2);
-
+    println!("Day03 Part1: {}", sum_of_mults);
+    println!("Day03 Part2: {}", sum_of_mults_2);
     Ok(())
 }
-

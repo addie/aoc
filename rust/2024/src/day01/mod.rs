@@ -2,8 +2,10 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-fn main() -> io::Result<()> {
-    let file_path = "data.txt";
+pub fn solution() -> io::Result<()> {
+    let day = "day01";
+
+    let file_path = format!("src/{}/data.txt", day);
     let file = File::open(file_path)?;
 
     // Use a buffered reader
@@ -29,7 +31,7 @@ fn main() -> io::Result<()> {
         .zip(ids_two.iter())
         .map(|(&id1, &id2)| (id1 - id2).abs())
         .sum();
-    println!("total part 1 = {}", total);
+    println!("Day01 Part1: {}", total);
 
     // Part 2
     // Create a counter using HashMap
@@ -40,11 +42,10 @@ fn main() -> io::Result<()> {
     }
     for &id in &ids_one {
         if let Some(&count) = counter.get(&id) {
-            println!("ID: {}, Count: {}", id, count);
+            // println!("ID: {}, Count: {}", id, count);
             total2 += id * count;
         }
     }
-    println!("total part 2 = {}", total2);
-
+    println!("Day01 Part2: {}", total2);
     Ok(())
 }

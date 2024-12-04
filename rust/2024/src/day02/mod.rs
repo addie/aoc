@@ -1,8 +1,10 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 
-fn main() -> io::Result<()> {
-    let file_path = "data.txt";
+pub fn solution() -> io::Result<()> {
+    let day = "day02";
+
+    let file_path = format!("src/{}/data.txt", day);
     let file = File::open(file_path)?;
 
     // Use a buffered reader
@@ -30,9 +32,8 @@ fn main() -> io::Result<()> {
         }
     }
 
-    println!("Safe Count: {}", num_safe);
-    println!("Safe Count (with dampeners): {}", num_safe_with_dampeners);
-
+    println!("Day02 Part1: {}", num_safe);
+    println!("Day02 Part2: {}", num_safe_with_dampeners);
     Ok(())
 }
 
@@ -40,15 +41,17 @@ fn is_safe(levels: &Vec<i32>) -> bool {
     if levels[1] == levels[0] {
         return false;
     }
-    if levels[1] - levels[0] > 0 { // increasing
-        for i in 0..levels.len()-1 {
+    if levels[1] - levels[0] > 0 {
+        // increasing
+        for i in 0..levels.len() - 1 {
             let diff = levels[i + 1] - levels[i];
             if diff < 1 || diff > 3 {
                 return false;
             }
         }
-    } else if levels[1] - levels[0] < 0 { // decreasing
-        for i in 0..levels.len()-1 {
+    } else if levels[1] - levels[0] < 0 {
+        // decreasing
+        for i in 0..levels.len() - 1 {
             let diff = levels[i + 1] - levels[i];
             if diff > -1 || diff < -3 {
                 return false;
