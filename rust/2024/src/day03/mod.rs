@@ -2,10 +2,9 @@ use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
 
+const DAY: &str = "day03";
 pub fn solution() -> io::Result<()> {
-    let day = "day03";
-
-    let file_path = format!("src/{}/data.txt", day);
+    let file_path = format!("src/{}/data.txt", DAY);
     let file = File::open(file_path)?;
 
     // Use a buffered reader

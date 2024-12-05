@@ -1,7 +1,8 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 
-const DAY: &str = "day04";
+const DAY: &str = "day05";
+
 pub fn solution() -> io::Result<()> {
     let file_path = format!("src/{}/data.txt", DAY);
     let file = File::open(file_path)?;
