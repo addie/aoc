@@ -17,6 +17,6 @@ fn main() {
     // day02::solution().unwrap();
     // day03::solution().unwrap();
     // day04::solution().unwrap();
-    day05::solution().unwrap();
-    // day06::solution().unwrap();
+    // day05::solution().unwrap();
+    day06::solution().unwrap();
 }
