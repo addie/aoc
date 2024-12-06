@@ -10,7 +10,7 @@ macro_rules! mod_list {
     };
 }
 
-mod_list!(day01, day02, day03, day04, day05);
+mod_list!(day01, day02, day03, day04, day05, day06);
 
 fn main() {
     // day01::solution().unwrap();
@@ -18,4 +18,5 @@ fn main() {
     // day03::solution().unwrap();
     // day04::solution().unwrap();
     day05::solution().unwrap();
+    // day06::solution().unwrap();
 }
