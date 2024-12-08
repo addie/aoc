@@ -55,11 +55,13 @@ fn in_bounds(grid: &[Vec<char>], r: i32, c: i32) -> bool {
     r >= 0 && r < grid.len() as i32 && c >= 0 && c < grid[0].len() as i32
 }
 
-fn print_grid(grid: &[Vec<char>], position: (i32, i32)) {
+fn print_grid(grid: &[Vec<char>], position: (i32, i32), visited: &HashSet<(usize, usize)>) {
     for (r, row) in grid.iter().enumerate() {
         for (c, &cell) in row.iter().enumerate() {
             if (r as i32, c as i32) == position {
                 print!("G");
+            } else if visited.contains(&(r, c)) {
+                print!("X");
             } else {
                 print!("{}", cell);
             }
@@ -76,20 +78,19 @@ fn simulate_patrol(grid: &[Vec<char>], start: (usize, usize), facing: Direction)
 
     while in_bounds(grid, position.0, position.1) {
         visited.insert((position.0 as usize, position.1 as usize));
-        print_grid(grid, position);
+        // print_grid(grid, position, &visited);
 
         let (dr, dc) = direction.offset();
         let next = (position.0 + dr, position.1 + dc);
+
+        if !in_bounds(grid, next.0, next.1) {
+            break;
+        }
 
         if in_bounds(grid, next.0, next.1) && grid[next.0 as usize][next.1 as usize] != '#' {
             position = next;
         } else {
             direction = direction.turn_right();
-        }
-
-        if visited.len() > grid.len() * grid[0].len() {
-            println!("Breaking due to excessive steps.");
-            break;
         }
     }
 
@@ -108,7 +109,6 @@ fn test_obstruction(grid: &mut Vec<Vec<char>>, start: (usize, usize), facing: Di
     let mut direction = facing;
 
     while in_bounds(grid, position.0, position.1) {
-        print_grid(grid, position);
         let key = (position.0 as usize, position.1 as usize, direction);
         if visited.contains_key(&key) {
             grid[r][c] = '.'; // Restore
@@ -118,6 +118,10 @@ fn test_obstruction(grid: &mut Vec<Vec<char>>, start: (usize, usize), facing: Di
 
         let (dr, dc) = direction.offset();
         let next = (position.0 + dr, position.1 + dc);
+
+        if !in_bounds(grid, next.0, next.1) {
+            break;
+        }
 
         if in_bounds(grid, next.0, next.1) && grid[next.0 as usize][next.1 as usize] != '#' {
             position = next;
@@ -137,7 +141,7 @@ fn test_obstruction(grid: &mut Vec<Vec<char>>, start: (usize, usize), facing: Di
 
 const DAY: &str = "day06";
 pub fn solution() -> io::Result<()> {
-    let file_path = format!("src/{}/data_sample.txt", DAY);
+    let file_path = format!("src/{}/data.txt", DAY);
 
     // Use a buffered reader
     let contents = fs::read_to_string(file_path)?;
