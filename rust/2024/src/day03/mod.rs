@@ -16,7 +16,7 @@ pub fn solution() -> io::Result<()> {
     // Read the file line by line
     let mut mult_enabled = true;
     for line in reader.lines() {
-        let line = line.unwrap();
+        let line = line?;
 
         // part1
         let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
@@ -26,6 +26,7 @@ pub fn solution() -> io::Result<()> {
                     * second.as_str().parse::<i32>().unwrap();
             }
         }
+
 
         // part2
 
@@ -43,17 +44,17 @@ pub fn solution() -> io::Result<()> {
             let matched_text = mat.as_str();
             if mult_enabled && regex_a.is_match(matched_text) {
                 // println!("Matched 'mult' pattern: {}", matched_text);
-                if let Some(captures) = regex_a.captures(matched_text)
-                    && let (Some(first), Some(second)) = (captures.get(1), captures.get(2))
-                {
-                    let one = first.as_str().parse::<i32>().unwrap();
-                    let two = second.as_str().parse::<i32>().unwrap();
-                    sum_of_mults_2 += one * two;
+                if let Some(captures) = regex_a.captures(matched_text) {
+                    if let (Some(first), Some(second)) = (captures.get(1), captures.get(2)) {
+                        let one = first.as_str().parse::<i32>().unwrap();
+                        let two = second.as_str().parse::<i32>().unwrap();
+                        sum_of_mults_2 += one * two;
+                    }
+                } else if regex_b.is_match(matched_text) {
+                    mult_enabled = true;
+                } else if regex_c.is_match(matched_text) {
+                    mult_enabled = false;
                 }
-            } else if regex_b.is_match(matched_text) {
-                mult_enabled = true;
-            } else if regex_c.is_match(matched_text) {
-                mult_enabled = false;
             }
         }
     }

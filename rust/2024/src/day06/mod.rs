@@ -1,113 +1,164 @@
-use std::fs::File;
-use std::io::{self, BufRead};
+use std::collections::{HashMap, HashSet};
+use std::{fs, io};
 
-const DAY: &str = "day06";
-
-#[derive(Clone, Copy, PartialEq, Debug)]
-enum Dir {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum Direction {
     North,
     East,
     South,
     West,
 }
 
-impl Dir {
-    fn next(&self) -> Self {
+impl Direction {
+    fn turn_right(&self) -> Self {
         match self {
-            &Self::North => Self::East,
-            &Self::East => Self::South,
-            &Self::South => Self::West,
-            &Self::West => Self::North,
+            Direction::North => Direction::East,
+            Direction::East => Direction::South,
+            Direction::South => Direction::West,
+            Direction::West => Direction::North,
         }
     }
 
     fn offset(&self) -> (i32, i32) {
         match self {
-            Dir::North => (-1, 0),
-            Dir::East => (0, 1),
-            Dir::South => (1, 0),
-            Dir::West => (0, -1),
+            Direction::North => (-1, 0),
+            Direction::East => (0, 1),
+            Direction::South => (1, 0),
+            Direction::West => (0, -1),
         }
     }
 }
 
-pub fn solution() -> io::Result<()> {
-    let file_path = format!("src/{}/data.txt", DAY);
-    let file = File::open(file_path)?;
+fn parse_input(input: &str) -> (Vec<Vec<char>>, (usize, usize), Direction) {
+    let mut grid = Vec::new();
+    let mut start = (0, 0);
+    let mut facing = Direction::North;
 
-    // Use a buffered reader
-    let reader = io::BufReader::new(file);
-    let mut grid: Vec<Vec<char>> = Vec::new();
-    for line in reader.lines() {
-        let line = line?;
-        let row = line.chars().collect::<Vec<char>>();
+    for (row_idx, line) in input.lines().enumerate() {
+        let mut row = Vec::new();
+        for (col_idx, ch) in line.chars().enumerate() {
+            if ch == '^' {
+                start = (row_idx, col_idx);
+                facing = Direction::North;
+                row.push('.');
+            } else {
+                row.push(ch);
+            }
+        }
         grid.push(row);
     }
 
-    // Find start position
-    let mut count = 1; // make sure we count start position
-    let mut curr: (usize, usize) = (0, 0);
-    let mut facing = Dir::North;
-    for r in 0..grid.len() {
-        for c in 0..grid[r].len() {
-            if grid[r][c] == '^' {
-                curr = (r, c);
-                grid[r][c] = 'X';
-                // println!("visited ({}, {})", r, c);
-                // pretty_print(&grid);
+    (grid, start, facing)
+}
+
+fn in_bounds(grid: &[Vec<char>], r: i32, c: i32) -> bool {
+    r >= 0 && r < grid.len() as i32 && c >= 0 && c < grid[0].len() as i32
+}
+
+fn print_grid(grid: &[Vec<char>], position: (i32, i32)) {
+    for (r, row) in grid.iter().enumerate() {
+        for (c, &cell) in row.iter().enumerate() {
+            if (r as i32, c as i32) == position {
+                print!("G");
+            } else {
+                print!("{}", cell);
             }
         }
-    }
-    curr = ((curr.0 as i32 + Dir::North.offset().0) as usize, (curr.1 as i32 + Dir::North.offset().1) as usize);
-    let mut next: (usize, usize) = curr;
-    while in_bound(&grid, curr.0, curr.1) {
-        if grid[curr.0][curr.1] == '.' {
-            count += 1;
-            grid[curr.0][curr.1] = 'X';
-        }
-        // println!("curr ({}, {})", curr.0, curr.1);
-        curr = next;
-        // println!("new curr ({}, {})", curr.0, curr.1);
-
-        next = get_next(&mut curr, &mut facing);
-        if !in_bound(&grid, next.0, next.1) {
-            if grid[curr.0][curr.1] == '.' {
-                count += 1;
-            }
-            break;
-        }
-        if grid[next.0][next.1] == '#' {
-            facing = facing.next();
-            next = get_next(&mut curr, &mut facing);
-            // // println!("face change {:?}", facing)
-        }
-        // println!("new next ({}, {})", next.0, next.1);
-        // pretty_print(&grid);
-    }
-
-    println!("{}", count);
-
-    Ok(())
-}
-
-fn get_next(curr: &mut (usize, usize), moving: &mut Dir) -> (usize, usize) {
-    ((curr.0 as i32 + moving.offset().0) as usize, (curr.1 as i32 + moving.offset().1) as usize)
-}
-
-fn in_bound(grid: &Vec<Vec<char>>, r: usize, c: usize) -> bool {
-    r < grid.len() && c < grid[r].len()
-}
-
-fn pretty_print<T: std::fmt::Display>(matrix: &[Vec<T>]) {
-    println!("  0 1 2 3 4 5 6 7 8 9");
-    for (i, row) in matrix.iter().enumerate() {
-        print!("{} ", i);
-        // Join the elements of the row into a single string, separated by spaces.
-        let line = row.iter()
-            .map(|elem| elem.to_string())
-            .collect::<Vec<_>>()
-            .join(" ");
-        println!("{}", line);
+        println!();
     }
     println!();
+}
+
+fn simulate_patrol(grid: &[Vec<char>], start: (usize, usize), facing: Direction) -> HashSet<(usize, usize)> {
+    let mut visited = HashSet::new();
+    let mut position = (start.0 as i32, start.1 as i32);
+    let mut direction = facing;
+
+    while in_bounds(grid, position.0, position.1) {
+        visited.insert((position.0 as usize, position.1 as usize));
+        print_grid(grid, position);
+
+        let (dr, dc) = direction.offset();
+        let next = (position.0 + dr, position.1 + dc);
+
+        if in_bounds(grid, next.0, next.1) && grid[next.0 as usize][next.1 as usize] != '#' {
+            position = next;
+        } else {
+            direction = direction.turn_right();
+        }
+
+        if visited.len() > grid.len() * grid[0].len() {
+            println!("Breaking due to excessive steps.");
+            break;
+        }
+    }
+
+    visited
+}
+
+fn test_obstruction(grid: &mut Vec<Vec<char>>, start: (usize, usize), facing: Direction, r: usize, c: usize) -> bool {
+    if grid[r][c] == '#' || (r, c) == start {
+        return false;
+    }
+
+    grid[r][c] = '#';
+
+    let mut visited = HashMap::new();
+    let mut position = (start.0 as i32, start.1 as i32);
+    let mut direction = facing;
+
+    while in_bounds(grid, position.0, position.1) {
+        print_grid(grid, position);
+        let key = (position.0 as usize, position.1 as usize, direction);
+        if visited.contains_key(&key) {
+            grid[r][c] = '.'; // Restore
+            return true;
+        }
+        visited.insert(key, true);
+
+        let (dr, dc) = direction.offset();
+        let next = (position.0 + dr, position.1 + dc);
+
+        if in_bounds(grid, next.0, next.1) && grid[next.0 as usize][next.1 as usize] != '#' {
+            position = next;
+        } else {
+            direction = direction.turn_right();
+        }
+
+        if visited.len() > grid.len() * grid[0].len() {
+            println!("Breaking due to excessive steps.");
+            break;
+        }
+    }
+
+    grid[r][c] = '.'; // Restore
+    false
+}
+
+const DAY: &str = "day06";
+pub fn solution() -> io::Result<()> {
+    let file_path = format!("src/{}/data_sample.txt", DAY);
+
+    // Use a buffered reader
+    let contents = fs::read_to_string(file_path)?;
+    let (mut grid, start, facing) = parse_input(&contents);
+
+    // Part 1
+    println!("Starting Part 1 simulation:");
+    let visited_positions = simulate_patrol(&grid, start, facing);
+    println!("Part 1: {} distinct positions visited", visited_positions.len());
+
+    // Part 2
+    println!("Starting Part 2 simulation:");
+    let mut loop_count = 0;
+    for r in 0..grid.len() {
+        for c in 0..grid[0].len() {
+            if test_obstruction(&mut grid, start, facing, r, c) {
+                loop_count += 1;
+            }
+        }
+    }
+    println!("Part 2: {} positions cause a loop", loop_count);
+
+    Ok(())
 }
